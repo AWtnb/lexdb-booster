@@ -24,24 +24,74 @@ type HotkeyContext = FramePair & {
   url: URL;
 };
 
+/**
+ * アクションを識別するID
+ * optionページの保存データやキーバインド設定はこのIDを介してやりとりする
+ */
+type ActionId = "submitSearch" | "clearBodyInputs" | "focusBodyFrame";
+
 type HotkeyAction = (ctx: HotkeyContext) => void;
+
+/**
+ * キー文字列とアクションIDの対応
+ * 将来的にユーザー設定（optionページ・storage）から読み込む部分
+ */
+type KeyBinding = {
+  key: string;
+  actionId: ActionId;
+};
 
 // ============================================================================
 // ユーティリティ
 // ============================================================================
 
+// ============================================================================
+// modkeyの順序定義（唯一の真実）
+// ============================================================================
+
 /**
- * キー入力文字列を生成する（例: "A-l"）
+ * 修飾キーのプレフィックスと、対応するKeyboardEventのプロパティ名
+ * 配列の順序がそのまま文字列連結の順序になる
+ * ここを変更すれば全体の順序が追従する
  */
-const buildKeyString = (keyEvent: KeyboardEvent): string => {
-  return (
-    (keyEvent.ctrlKey ? "C-" : "") +
-    (keyEvent.altKey ? "A-" : "") +
-    (keyEvent.shiftKey ? "S-" : "") +
-    keyEvent.key.toLowerCase()
-  );
+const MODIFIER_ORDER: { prefix: string; eventKey: keyof KeyboardEvent }[] = [
+  { prefix: "C-", eventKey: "ctrlKey" },
+  { prefix: "A-", eventKey: "altKey" },
+  { prefix: "S-", eventKey: "shiftKey" },
+];
+
+/**
+ * KeyboardEventから修飾キー部分の文字列を組み立てる（例: "C-A-"）
+ */
+const buildModifierPrefix = (keyEvent: KeyboardEvent): string => {
+  return MODIFIER_ORDER.filter(({ eventKey }) => keyEvent[eventKey])
+    .map(({ prefix }) => prefix)
+    .join("");
 };
 
+/**
+ * キー入力文字列を生成する（例: "C-A-l"）
+ */
+const buildKeyString = (keyEvent: KeyboardEvent): string => {
+  return buildModifierPrefix(keyEvent) + keyEvent.key.toLowerCase();
+};
+
+/**
+ * ユーザーがoptionページなどで自由な順序で入力したキー文字列を正規化する
+ * 例: "S-A-c" と "A-S-c" はどちらも "A-S-c" になる
+ * KeyBinding保存前や読み込み時にこれを通すことで、順序ゆらぎによる不一致を防ぐ
+ */
+const normalizeKeyString = (raw: string): string => {
+  const parts = raw.split("-");
+  const mainKey = parts.pop() ?? "";
+  const modSet = new Set(parts.map((p) => `${p}-`));
+
+  const prefix = MODIFIER_ORDER.filter(({ prefix }) => modSet.has(prefix))
+    .map(({ prefix }) => prefix)
+    .join("");
+
+  return prefix + mainKey.toLowerCase();
+};
 // ============================================================================
 // アクション定義（実処理）
 // ============================================================================
@@ -53,6 +103,67 @@ const buildKeyString = (keyEvent: KeyboardEvent): string => {
 const submitSearch: HotkeyAction = ({ headWindow, url }) => {
   if (!url.pathname.endsWith("SearchAll.aspx")) return;
   headWindow.SubmitSearchBottom?.("search", "_parent");
+};
+
+/**
+ * bodyDocument内のテキスト入力欄をクリアする
+ */
+const clearBodyInputs: HotkeyAction = ({ bodyDocument }) => {
+  bodyDocument
+    .querySelectorAll<HTMLInputElement>("input[type='text']")
+    .forEach((el) => {
+      el.value = "";
+    });
+};
+
+/**
+ * bodyフレームにフォーカスする
+ */
+const focusBodyFrame: HotkeyAction = ({ bodyWindow }) => {
+  bodyWindow.focus();
+};
+
+// ============================================================================
+// アクションレジストリ（ID → 実処理）
+// コード側の責務。ユーザー設定には含めない
+// ============================================================================
+
+const ACTION_REGISTRY: Record<ActionId, HotkeyAction> = {
+  submitSearch,
+  clearBodyInputs,
+  focusBodyFrame,
+};
+
+// ============================================================================
+// デフォルトのキーバインド（キー → ID）
+// ユーザー設定が存在しない場合や初期値として使う
+// 将来的にはoptionページで編集された内容でここを置き換える
+// ============================================================================
+
+const DEFAULT_KEY_BINDINGS: KeyBinding[] = [
+  { key: "A-enter", actionId: "submitSearch" },
+  { key: "A-l", actionId: "submitSearch" },
+  { key: "A-c", actionId: "clearBodyInputs" },
+];
+
+/**
+ * キーバインド配列から「キー文字列 → 実処理」のマップを組み立てる
+ * KeyBinding[]（ユーザー設定由来のデータ）とACTION_REGISTRY（コード由来のデータ）を
+ * ここで初めて結びつける
+ */
+const buildHotkeyActionMap = (
+  bindings: KeyBinding[],
+): Record<string, HotkeyAction> => {
+  const map: Record<string, HotkeyAction> = {};
+  for (const binding of bindings) {
+    const action = ACTION_REGISTRY[binding.actionId];
+    if (!action) {
+      console.warn(`未知のactionIdです: ${binding.actionId}`);
+      continue;
+    }
+    map[binding.key] = action;
+  }
+  return map;
 };
 
 // ============================================================================
@@ -117,20 +228,6 @@ const getFramePair = (): FramePair | null => {
   return { headWindow, bodyWindow, bodyDocument };
 };
 
-// ============================================================================
-// ホットキーマップ
-// ============================================================================
-
-/**
- * キー文字列ごとのアクションをまとめたマップ
- * 追加する場合はここにエントリを増やすだけでよい
- * どの依存（headWindow/bodyWindow/bodyDocument）を使うかはアクション側の関心事
- */
-const HOTKEY_ACTIONS: Record<string, HotkeyAction> = {
-  "A-enter": submitSearch,
-  "A-l": submitSearch,
-};
-
 /**
  * ホットキーをセットアップする
  * frame構成: frames[0] = head(ボタン側), frames[1] = contents(入力側)
@@ -150,9 +247,12 @@ const setupHotkeys = (): boolean => {
   const url = new URL(window.location.href);
   const ctx: HotkeyContext = { ...framePair, url };
 
+  // 現状はデフォルト値を使う。後続でstorageから読み込む処理に差し替える
+  const hotkeyActions = buildHotkeyActionMap(DEFAULT_KEY_BINDINGS);
+
   bodyDocument.onkeyup = (keyEvent) => {
     const pressed = buildKeyString(keyEvent);
-    HOTKEY_ACTIONS[pressed]?.(ctx);
+    hotkeyActions[pressed]?.(ctx);
   };
 
   bodyWindow._hotkeyInitialized = true;
@@ -191,7 +291,7 @@ export default defineContentScript({
     "https://lex.lawlibrary.jp/lexbin/ShowSyoshi.aspx*",
     "https://lex.lawlibrary.jp/lexbin/ShowZenbun.aspx*",
     "https://www.lawlibrary.jp/Law/LawLibrary/LawTOP.aspx",
-    "https://www.lawlibrary.jp/Law/ReLoginForm.aspx",
+    "https://www.lawlibrary.jp/Law/ReLoginForm.aspx*",
   ],
   world: "MAIN",
   runAt: "document_idle",
