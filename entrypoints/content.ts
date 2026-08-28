@@ -15,6 +15,17 @@ type FramePair = {
   bodyDocument: Document;
 };
 
+/**
+ * ホットキーアクションが参照できる依存一式
+ * 今後 bodyWindow や bodyDocument を使うアクションを増やしても
+ * この型・contextにフィールドを追加するだけでよい
+ */
+type HotkeyContext = FramePair & {
+  url: URL;
+};
+
+type HotkeyAction = (ctx: HotkeyContext) => void;
+
 // ============================================================================
 // ユーティリティ
 // ============================================================================
@@ -31,11 +42,15 @@ const buildKeyString = (keyEvent: KeyboardEvent): string => {
   );
 };
 
+// ============================================================================
+// アクション定義（実処理）
+// ============================================================================
+
 /**
  * head側フレームの検索実行ボタンを押す
  * SearchAll.aspx以外では何もしない
  */
-const pressSubmitButton = (headWindow: FrameWindow, url: URL) => {
+const submitSearch: HotkeyAction = ({ headWindow, url }) => {
   if (!url.pathname.endsWith("SearchAll.aspx")) return;
   headWindow.SubmitSearchBottom?.("search", "_parent");
 };
@@ -103,21 +118,17 @@ const getFramePair = (): FramePair | null => {
 };
 
 // ============================================================================
-// ホットキー定義
+// ホットキーマップ
 // ============================================================================
 
 /**
- * キー文字列ごとの処理をまとめたマップ
+ * キー文字列ごとのアクションをまとめたマップ
  * 追加する場合はここにエントリを増やすだけでよい
+ * どの依存（headWindow/bodyWindow/bodyDocument）を使うかはアクション側の関心事
  */
-const createHotkeyActions = (
-  headWindow: FrameWindow,
-  url: URL,
-): Record<string, () => void> => {
-  return {
-    "A-enter": () => pressSubmitButton(headWindow, url),
-    "A-l": () => pressSubmitButton(headWindow, url),
-  };
+const HOTKEY_ACTIONS: Record<string, HotkeyAction> = {
+  "A-enter": submitSearch,
+  "A-l": submitSearch,
 };
 
 /**
@@ -129,7 +140,7 @@ const setupHotkeys = (): boolean => {
   const framePair = getFramePair();
   if (!framePair) return false;
 
-  const { headWindow, bodyWindow, bodyDocument } = framePair;
+  const { bodyWindow, bodyDocument } = framePair;
 
   if (bodyWindow._hotkeyInitialized) {
     console.log("すでにホットキーが初期化されています");
@@ -137,11 +148,11 @@ const setupHotkeys = (): boolean => {
   }
 
   const url = new URL(window.location.href);
-  const actions = createHotkeyActions(headWindow, url);
+  const ctx: HotkeyContext = { ...framePair, url };
 
   bodyDocument.onkeyup = (keyEvent) => {
     const pressed = buildKeyString(keyEvent);
-    actions[pressed]?.();
+    HOTKEY_ACTIONS[pressed]?.(ctx);
   };
 
   bodyWindow._hotkeyInitialized = true;
