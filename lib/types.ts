@@ -1,0 +1,70 @@
+/**
+ * フレームのwindowオブジェクト
+ * SubmitSearchBottomはページ内で定義されるグローバル関数
+ * _hotkeyInitializedは初期化済みかどうかのフラグ（多重登録防止用）
+ */
+export type FrameWindow = Window & {
+  _hotkeyInitialized?: boolean;
+  SubmitSearchBottom?: (mode: string, target: string) => void;
+  ShowBunken?: (mode: string, num: string) => void;
+};
+
+export type FramePair = {
+  headWindow: FrameWindow;
+  bodyWindow: FrameWindow;
+  bodyDocument: Document;
+};
+
+export type HotkeyContext = FramePair & {
+  url: URL;
+  keyEvent: KeyboardEvent;
+  isInputableElem: boolean;
+};
+
+export type HotkeyAction = (ctx: HotkeyContext) => void | Promise<void>;
+export type HotkeyActionWithClipboardText = (
+  ctx: HotkeyContext,
+  clipboardText: string,
+) => void | Promise<void>;
+
+/**
+ * アクションを識別するID
+ * optionページの保存データやキーバインド設定はこのIDを介してやりとりする
+ */
+export type ActionId =
+  | "submitSearch"
+  | "goHome"
+  | "clearAllInputBox"
+  | "pasteCaseNumber"
+  | "pasteDate"
+  | "pasteLexId"
+  | "focusFreeWord"
+  | "focusBlankFreeWord"
+  | "pasteSmoothCsv"
+  | "pasteKiri"
+  | "copyCaseNumber"
+  | "copyReferenceId"
+  | "copyReferenceIdPlain"
+  | "copyReferenceIdWithCaseNumber"
+  | "copyReferenceNumWithCaseNumber"
+  | "gotoZenbun"
+  | "gotoSyoshi"
+  | "openTopResult";
+
+/**
+ * キー文字列とアクションIDの対応
+ * 将来的にユーザー設定（optionページ・storage）から読み込む部分
+ */
+export type KeyBinding = {
+  key: string;
+  actionId: ActionId;
+};
+
+/**
+ * 桐の行コピーをパースした結果
+ */
+export type KiriLine = {
+  place: string;
+  date: string;
+  src: string;
+};
