@@ -20,14 +20,15 @@ export default defineContentScript({
     "https://lex.lawlibrary.jp/lexbin/LinkSyoshi.aspx*",
     "https://lex.lawlibrary.jp/lexbin/SearchAllResult.aspx*",
     "https://lex.lawlibrary.jp/lexbin/ShowZenbun.aspx*",
-    "https://www.lawlibrary.jp/Law/ReLoginForm.aspx",
+    "https://www.lawlibrary.jp/Law/ReLoginForm.aspx*",
     "https://www.lawlibrary.jp/Law/LawLibrary/LawTOP.aspx",
     "https://lex.lawlibrary.jp/lexbin/DBSelectLaw.aspx",
   ],
   world: "MAIN",
   runAt: "document_idle",
   main: () => {
-    const targetId = SIMPLE_FOCUS_TARGETS[window.location.href];
+    const targetId =
+      SIMPLE_FOCUS_TARGETS[window.location.href.replace(/\?.*$/, "")];
     if (targetId) {
       document.getElementById(targetId)?.focus();
       return;
