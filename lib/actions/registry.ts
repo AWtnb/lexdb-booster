@@ -93,7 +93,7 @@ const goHome = (): void => {
 export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
   submitSearch: {
     label: "検索実行",
-    scope: "any",
+    scope: "search",
     needsClipboard: false,
     run: (ctx) => pressSubmitButton(ctx),
   },
