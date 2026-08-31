@@ -3,7 +3,6 @@ import { FREEWORD_IDS, setFreeWords } from "../free-words";
 import { parseKiriLines } from "../kiri";
 import {
   expandGengo,
-  getCurrentClipboardText,
   toFullWidthDigits,
   toGengouAndTripletNum,
   toHalfWidth,
@@ -274,10 +273,10 @@ export const handleSmoothCsvPaste: HotkeyActionWithClipboardText = (
 /**
  * 桐の行コピーから一括貼り付け
  */
-export const handleKiriPaste: HotkeyAction = async ({
-  bodyDocument,
-}): Promise<void> => {
-  const cb = await getCurrentClipboardText();
+export const handleKiriPaste: HotkeyActionWithClipboardText = (
+  { bodyDocument },
+  cb: string,
+): void => {
   const kiri = parseKiriLines(cb);
 
   if (kiri.src) {
