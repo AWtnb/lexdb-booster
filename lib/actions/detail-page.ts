@@ -8,7 +8,7 @@ export const getDisplayedCaseNumber = (doc: Document): string => {
   const caseNumbers = Array.from(
     doc.querySelectorAll<HTMLElement>("tbody tr td:nth-child(2)"),
   )
-    .filter((el) => el.style.background === "salmon")
+    .filter((el) => el.style.background === "salmon") // TODO
     .map((el) => el.innerText);
 
   if (caseNumbers.length) {
