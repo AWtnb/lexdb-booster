@@ -53,17 +53,17 @@ export const handleHotkey = async (
     if (await handleSearchPageHotkey(pressed, ctx)) return;
   }
 
-  // 詳細ページ限定のキー
-  if (isDetailPage(url)) {
-    if (handleDetailPageHotkey(pressed, ctx)) return;
-  }
-
   // 検索結果ページ限定のキー
   if (isSearchResultPage(url) && !isInputableElem) {
     if (pressed === " ") {
       openTopResult(ctx);
       return;
     }
+  }
+
+  // 詳細ページ限定のキー
+  if (isDetailPage(url)) {
+    if (handleDetailPageHotkey(pressed, ctx)) return;
   }
 
   // 全文ページ限定のキー
