@@ -129,7 +129,7 @@ const handleSearchPageHotkey = async (
 
   if (pressed === "v") {
     clearAllInputBox(ctx);
-    await handleKiriPaste(ctx);
+    handleKiriPaste(ctx, cb);
     return true;
   }
 
