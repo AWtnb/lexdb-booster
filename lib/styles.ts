@@ -42,6 +42,20 @@ const collectFollowingRows = (elem: HTMLElement): HTMLTableRowElement[] => {
   return rows;
 };
 
+/** 見出しテキストと背景色の対応表 */
+const HEADING_BACKGROUND_MAP: Record<string, string> = {
+  "【事件番号】": "salmon",
+  "【掲載文献】": "plum",
+  "【備考】": "silver",
+  "【裁判年月日】": "gold",
+};
+
+/**
+ * 先頭に移動する見出しグループの定義
+ * mapの順序 = テーブル先頭への挿入順
+ */
+const REORDER_HEADINGS = ["【事件番号】", "【掲載文献】", "【備考】"] as const;
+
 /**
  * 詳細ページのスタイル適用
  * 【事件番号】【掲載文献】【備考】を色分けしつつ、テーブル先頭に並び替える
@@ -51,44 +65,37 @@ export const applyDetailPageStyles = (doc: Document): void => {
   if (!table) return;
 
   let background = "inherit";
-  let referenceRows: HTMLTableRowElement[] = [];
-  let caseNumberRows: HTMLTableRowElement[] = [];
-  let memoRows: HTMLTableRowElement[] = [];
+  const reorderRowsMap = new Map<string, HTMLTableRowElement[]>(
+    REORDER_HEADINGS.map((h) => [h, []]),
+  );
 
   Array.from(doc.getElementsByTagName("td")).forEach((elem) => {
     elem.style.fontFamily = "'UDEV Gothic', HackGen";
     elem.style.lineHeight = "1.5";
 
-    if (elem.innerText === "【事件番号】") {
-      background = "salmon";
-      caseNumberRows = collectFollowingRows(elem);
-    } else if (elem.innerText === "【掲載文献】") {
-      background = "plum";
-      referenceRows = collectFollowingRows(elem);
-    } else if (elem.innerText === "【備考】") {
-      background = "silver";
-      memoRows = collectFollowingRows(elem);
-    } else if (elem.innerText === "【裁判年月日】") {
-      background = "gold";
-    } else if (elem.innerText.startsWith("【")) {
-      background = "inherit";
+    const text = elem.innerText;
+
+    if (text.startsWith("【")) {
+      background = HEADING_BACKGROUND_MAP[text] ?? "inherit";
+
+      if (reorderRowsMap.has(text)) {
+        reorderRowsMap.set(text, collectFollowingRows(elem));
+      }
     }
 
-    const target = elem.nextElementSibling as HTMLElement | null;
-    if (target) {
-      target.style.background = background;
+    const nextCell = elem.nextElementSibling as HTMLElement | null;
+    if (nextCell) {
+      nextCell.style.background = background;
     }
   });
 
   // 【事件番号】【掲載文献】【備考】の行をテーブルの先頭に移動
-  const tbody = table.querySelector("tbody") || table;
+  const tbody = table.querySelector("tbody") ?? table;
   const firstRow = tbody.querySelector("tr");
 
-  [caseNumberRows, referenceRows, memoRows].forEach((rows) => {
-    if (0 < rows.length) {
-      rows.forEach((row) => {
-        tbody.insertBefore(row, firstRow);
-      });
-    }
+  REORDER_HEADINGS.forEach((heading) => {
+    reorderRowsMap.get(heading)?.forEach((row) => {
+      tbody.insertBefore(row, firstRow);
+    });
   });
 };
