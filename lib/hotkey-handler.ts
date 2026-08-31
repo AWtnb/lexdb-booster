@@ -5,10 +5,10 @@ import {
   isSearchPage,
   isZenbunPage,
 } from "./page";
-import { keyBindingsStorage } from "./storage";
 import { ACTION_REGISTRY } from "./actions/registry";
 import type { ActionEntry } from "./actions/registry";
 import type { HotkeyContext, KeyBinding } from "./types";
+import { DEFAULT_KEY_BINDINGS } from "./keybindings";
 
 /**
  * Alt修飾キーを含むキーバインドかどうか
@@ -43,9 +43,7 @@ export const handleHotkey = async (
   ctx: HotkeyContext,
 ): Promise<void> => {
   const { url, isInputableElem } = ctx;
-  const bindings = await keyBindingsStorage.getValue();
-
-  for (const binding of bindings) {
+  for (const binding of DEFAULT_KEY_BINDINGS) {
     if (binding.key !== pressed) continue;
 
     const entry = ACTION_REGISTRY[binding.actionId];
