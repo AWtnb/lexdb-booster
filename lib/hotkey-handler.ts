@@ -32,14 +32,7 @@ export const handleHotkey = async (
   pressed: string,
   ctx: HotkeyContext,
 ): Promise<void> => {
-  const {
-    url,
-    keyEvent,
-    isInputableElem,
-    headWindow,
-    bodyWindow,
-    bodyDocument,
-  } = ctx;
+  const { url, isInputableElem } = ctx;
 
   // Alt+Enter: 検索実行
   if (pressed === "A-enter" || pressed === "A-l") {
@@ -62,13 +55,13 @@ export const handleHotkey = async (
 
   // 詳細ページ限定のキー
   if (isDetailPage(url)) {
-    if (handleDetailPageHotkey(pressed, keyEvent, url, bodyDocument)) return;
+    if (handleDetailPageHotkey(pressed, ctx)) return;
   }
 
   // 検索結果ページ限定のキー
   if (isSearchResultPage(url) && !isInputableElem) {
     if (pressed === " ") {
-      openTopResult(bodyWindow, bodyDocument);
+      openTopResult(ctx);
       return;
     }
   }
@@ -149,10 +142,9 @@ const handleSearchPageHotkey = async (
  */
 const handleDetailPageHotkey = (
   pressed: string,
-  keyEvent: KeyboardEvent,
-  url: URL,
-  bodyDocument: Document,
+  ctx: HotkeyContext,
 ): boolean => {
+  const { keyEvent, url, bodyDocument } = ctx;
   if (pressed === "c" && !keyEvent.ctrlKey) {
     const caseNum = getDisplayedCaseNumber(bodyDocument);
     if (caseNum) {

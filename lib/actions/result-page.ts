@@ -1,13 +1,19 @@
-import type { FrameWindow } from "../types";
+import type { HotkeyAction } from "../types";
 
 /**
  * 検索結果の先頭行を開く処理
  */
-export const openTopResult = (win: FrameWindow, doc: Document): void => {
-  const anchor = doc.querySelector("tr > td:nth-child(11) a");
+export const openTopResult: HotkeyAction = ({
+  bodyWindow,
+  bodyDocument,
+  keyEvent,
+}): void => {
+  const anchor = bodyDocument.querySelector("tr > td:nth-child(11) a");
   const js = anchor?.getAttribute("href");
   if (!js) return;
 
+  keyEvent.preventDefault();
+  keyEvent.stopPropagation();
   const num = js.substring(37, 45);
-  win.ShowBunken?.("ShowSyoshi", num);
+  bodyWindow.ShowBunken?.("ShowSyoshi", num);
 };
