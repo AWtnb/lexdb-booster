@@ -1,3 +1,41 @@
+/** 審級関係セクションの開始見出し */
+const APPEAL_INSTANCE_HEADER = "【審級関係】";
+
+/**
+ * 「【審級関係】」セクションに属する行の上ボーダーを装飾する
+ * 見出し行、2列目がcolspan=2の継続行、および次のセクション見出し行（終端）が対象
+ */
+const borderHistory = (doc: Document): void => {
+  const rows = Array.from(doc.getElementsByTagName("tr"));
+  const targetRowIndices: number[] = [];
+
+  for (let i = 0; i < rows.length; i++) {
+    const cells = Array.from(rows[i]!.getElementsByTagName("td"));
+    const rowHeader = cells[0]!.innerText.trim();
+
+    if (rowHeader === APPEAL_INSTANCE_HEADER) {
+      targetRowIndices.push(i);
+      continue;
+    }
+    if (targetRowIndices.length < 1) continue;
+
+    if (cells[1]?.colSpan === 2) {
+      targetRowIndices.push(i);
+      continue;
+    }
+    if (rowHeader.startsWith("【")) {
+      targetRowIndices.push(i);
+      break;
+    }
+  }
+
+  for (const index of targetRowIndices) {
+    for (const cell of Array.from(rows[index]!.getElementsByTagName("td"))) {
+      cell.style.borderTop = "1px solid gray";
+    }
+  }
+};
+
 /**
  * 検索結果ページのスタイル適用
  */
@@ -63,6 +101,8 @@ const REORDER_HEADINGS = ["【事件番号】", "【掲載文献】", "【備考
 export const applyDetailPageStyles = (doc: Document): void => {
   const table = doc.querySelector("table");
   if (!table) return;
+
+  borderHistory(doc);
 
   let background = "inherit";
   const reorderRowsMap = new Map<string, HTMLTableRowElement[]>(
