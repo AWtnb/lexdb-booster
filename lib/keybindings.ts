@@ -7,34 +7,34 @@ import type { KeyBinding } from "./types";
  */
 export const DEFAULT_KEY_BINDINGS: KeyBinding[] = [
   // 全ページ共通
-  { key: "A-enter", actionId: "submitSearch" },
-  { key: "A-l", actionId: "submitSearch" },
-  { key: "h", actionId: "goHome" },
+  { key: "A-Enter", actionId: "submitSearch" },
+  { key: "A-KeyL", actionId: "submitSearch" },
+  { key: "KeyH", actionId: "goHome" },
 
   // 検索ページ
-  { key: "A-c", actionId: "clearAllInputBox" },
-  { key: "n", actionId: "pasteCaseNumber" },
-  { key: "d", actionId: "pasteDate" },
-  { key: "l", actionId: "pasteLexId" },
-  { key: "f", actionId: "focusFreeWord" },
-  { key: "S-f", actionId: "focusBlankFreeWord" },
-  { key: "A-v", actionId: "pasteSmoothCsv" },
-  { key: "v", actionId: "pasteKiri" },
+  { key: "A-KeyC", actionId: "clearAllInputBox" },
+  { key: "KeyN", actionId: "pasteCaseNumber" },
+  { key: "KeyD", actionId: "pasteDate" },
+  { key: "KeyL", actionId: "pasteLexId" },
+  { key: "KeyF", actionId: "focusFreeWord" },
+  { key: "S-KeyF", actionId: "focusBlankFreeWord" },
+  { key: "A-KeyV", actionId: "pasteSmoothCsv" },
+  { key: "KeyV", actionId: "pasteKiri" },
 
   // 検索結果ページ
-  { key: " ", actionId: "openTopResult" },
+  { key: "Space", actionId: "openTopResult" },
 
   // 詳細ページ
-  { key: "c", actionId: "copyCaseNumber" },
-  { key: "i", actionId: "copyReferenceId" },
-  { key: "c-i", actionId: "copyReferenceIdPlain" },
-  { key: "S-i", actionId: "copyReferenceIdWithCaseNumber" },
-  { key: "A-i", actionId: "copyReferenceNumWithCaseNumber" },
-  { key: "z", actionId: "gotoZenbun" },
+  { key: "KeyC", actionId: "copyCaseNumber" },
+  { key: "KeyI", actionId: "copyReferenceId" },
+  { key: "C-KeyI", actionId: "copyReferenceIdPlain" },
+  { key: "S-KeyI", actionId: "copyReferenceIdWithCaseNumber" },
+  { key: "A-KeyI", actionId: "copyReferenceNumWithCaseNumber" },
+  { key: "KeyZ", actionId: "gotoZenbun" },
 
   // 全文ページ（zキーだが、gotoZenbunとはスコープが違うため別ActionIdが必要）
-  { key: "z", actionId: "gotoSyoshi" },
+  { key: "KeyZ", actionId: "gotoSyoshi" },
 
   // 全文ページ or 詳細ページ
-  { key: "r", actionId: "gotoSearchResults" },
+  { key: "KeyR", actionId: "gotoSearchResults" },
 ];

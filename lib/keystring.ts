@@ -19,10 +19,10 @@ const buildModifierPrefix = (keyEvent: KeyboardEvent): string => {
 };
 
 /**
- * キー入力文字列を生成する（例: "C-A-l"）
+ * キー入力文字列を生成する（例: "C-A-KeyL"）
  */
 export const buildKeyString = (keyEvent: KeyboardEvent): string => {
-  return buildModifierPrefix(keyEvent) + keyEvent.key.toLowerCase();
+  return buildModifierPrefix(keyEvent) + keyEvent.code;
 };
 
 /**
@@ -39,5 +39,5 @@ export const normalizeKeyString = (raw: string): string => {
     .map(({ prefix }) => prefix)
     .join("");
 
-  return prefix + mainKey.toLowerCase();
+  return prefix + mainKey;
 };
