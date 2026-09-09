@@ -34,4 +34,7 @@ export const DEFAULT_KEY_BINDINGS: KeyBinding[] = [
 
   // 全文ページ（zキーだが、gotoZenbunとはスコープが違うため別ActionIdが必要）
   { key: "z", actionId: "gotoSyoshi" },
+
+  // 全文ページ or 詳細ページ
+  { key: "r", actionId: "gotoSearchResults" },
 ];

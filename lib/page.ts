@@ -6,7 +6,10 @@ export const isDetailPage = (url: URL): boolean => {
 };
 
 export const isZenbunPage = (url: URL): boolean => {
-  return url.pathname.endsWith("ShowZenbun.aspx");
+  return (
+    url.pathname.endsWith("ShowZenbun.aspx") ||
+    url.pathname.endsWith("LinkZenbun.aspx")
+  );
 };
 
 export const isSearchResultPage = (url: URL): boolean => {

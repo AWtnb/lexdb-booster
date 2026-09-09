@@ -16,6 +16,7 @@ export default defineContentScript({
   matches: [
     "https://lex.lawlibrary.jp/lexbin/DBSelectLaw.aspx",
     "https://lex.lawlibrary.jp/lexbin/LinkSyoshi.aspx*",
+    "https://lex.lawlibrary.jp/lexbin/LinkZenbun.aspx*",
     "https://lex.lawlibrary.jp/lexbin/SearchAll.aspx",
     "https://lex.lawlibrary.jp/lexbin/SearchAllCheck.aspx",
     "https://lex.lawlibrary.jp/lexbin/SearchAllResult.aspx*",

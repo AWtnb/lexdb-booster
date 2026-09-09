@@ -33,6 +33,7 @@ const setupHotkeys = (): void => {
     }
 
     const headWindow = headFrame.contentWindow as FrameWindow;
+    const headDocument = headFrame.contentDocument || headWindow.document;
     const bodyWindow = bodyFrame.contentWindow as FrameWindow;
     const bodyDocument = bodyFrame.contentDocument || bodyWindow.document;
 
@@ -67,6 +68,7 @@ const setupHotkeys = (): void => {
         keyEvent,
         isInputableElem,
         headWindow,
+        headDocument,
         bodyWindow,
         bodyDocument,
       });

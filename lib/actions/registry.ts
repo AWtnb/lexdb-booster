@@ -15,7 +15,13 @@ import { copyString } from "../ui";
 import type { ActionId, HotkeyContext } from "../types";
 
 /** アクションが有効なページスコープ */
-export type PageScope = "search" | "searchResult" | "detail" | "zenbun" | "any";
+export type PageScope =
+  | "search"
+  | "searchResult"
+  | "detail"
+  | "zenbun"
+  | "detailOrZenbun"
+  | "any";
 
 /** レジストリ1エントリの定義 */
 export type ActionEntry = {
@@ -71,15 +77,25 @@ const copyReferenceNumWithCaseNumber = (ctx: HotkeyContext): void => {
 };
 
 const gotoZenbun = (ctx: HotkeyContext): void => {
-  const dest = new URL(ctx.url);
-  dest.pathname = "/lexbin/ShowZenbun.aspx";
-  window.location.href = dest.toString();
+  const l = ctx.headDocument.getElementById("ShowZenbunHyperLink");
+  if (!l) return;
+  l.click();
 };
 
 const gotoSyoshi = (ctx: HotkeyContext): void => {
-  const dest = new URL(ctx.url);
-  dest.pathname = "/lexbin/ShowSyoshi.aspx";
-  window.location.href = dest.toString();
+  const u = new URL(ctx.url);
+  if (u.pathname === "/lexbin/LinkZenbun.aspx") {
+    u.pathname = "/lexbin/LinkSyoshi.aspx";
+  } else {
+    u.pathname = "/lexbin/ShowSyoshi.aspx";
+  }
+  window.location.href = u.toString();
+};
+
+const gotoSearchResults = (ctx: HotkeyContext): void => {
+  const l = ctx.headDocument.getElementById("ResultHyperLink");
+  if (!l) return;
+  l.click();
 };
 
 const goHome = (): void => {
@@ -207,6 +223,12 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     scope: "zenbun",
     needsClipboard: false,
     run: (ctx) => gotoSyoshi(ctx),
+  },
+  gotoSearchResults: {
+    label: "検索結果へ移動",
+    scope: "detailOrZenbun",
+    needsClipboard: false,
+    run: (ctx) => gotoSearchResults(ctx),
   },
   openTopResult: {
     label: "検索結果の先頭を開く",

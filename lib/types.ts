@@ -11,6 +11,7 @@ export type FrameWindow = Window & {
 
 export type FramePair = {
   headWindow: FrameWindow;
+  headDocument: Document;
   bodyWindow: FrameWindow;
   bodyDocument: Document;
 };
@@ -49,6 +50,7 @@ export type ActionId =
   | "copyReferenceNumWithCaseNumber"
   | "gotoZenbun"
   | "gotoSyoshi"
+  | "gotoSearchResults"
   | "openTopResult";
 
 /**
