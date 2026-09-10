@@ -9,5 +9,11 @@ export default defineConfig({
       "https://lex.lawlibrary.jp/*",
       "https://www.lawlibrary.jp/*",
     ],
+    web_accessible_resources: [
+      {
+        resources: ["fonts/*"],
+        matches: ["https://lex.lawlibrary.jp/*", "https://www.lawlibrary.jp/*"],
+      },
+    ],
   },
 });

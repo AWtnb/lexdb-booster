@@ -1,3 +1,22 @@
+const FONT_NAME = "LexDBNotoSansJP";
+
+const getFontUrl = (): string => document.documentElement.dataset.fontUrl ?? "";
+
+const injectFontFace = (doc: Document): void => {
+  if (doc.getElementById("better-lexdb-font")) return;
+  const style = doc.createElement("style");
+
+  style.id = "better-lexdb-font";
+  style.textContent = `
+@font-face {
+  font-family: "${FONT_NAME}";
+  src: url("${getFontUrl()}") format("truetype");
+  font-style: normal;
+  font-display: swap;
+}`;
+  console.log(style.textContent);
+  (doc.head ?? doc.documentElement).appendChild(style);
+};
 /** 審級関係セクションの開始見出し */
 const APPEAL_INSTANCE_HEADER = "【審級関係】";
 
@@ -40,8 +59,9 @@ const borderHistory = (doc: Document): void => {
  * 検索結果ページのスタイル適用
  */
 export const applySearchResultPageStyles = (doc: Document): void => {
+  injectFontFace(doc);
   Array.from(doc.getElementsByTagName("td")).forEach((elem) => {
-    elem.style.fontFamily = "'UDEV Gothic', HackGen";
+    elem.style.fontFamily = FONT_NAME;
     if (elem.classList.contains("ListLow3")) {
       elem.style.background = "gold";
       Array.from(elem.children).forEach((child) => {
@@ -109,10 +129,10 @@ export const applyDetailPageStyles = (doc: Document): void => {
     REORDER_HEADINGS.map((h) => [h, []]),
   );
 
+  injectFontFace(doc);
   Array.from(doc.getElementsByTagName("td")).forEach((elem) => {
-    elem.style.fontFamily = "'UDEV Gothic', HackGen";
     elem.style.lineHeight = "1.5";
-
+    elem.style.fontFamily = FONT_NAME;
     const text = elem.innerText;
 
     if (text.startsWith("【")) {
