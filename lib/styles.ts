@@ -14,7 +14,6 @@ const injectFontFace = (doc: Document): void => {
   font-style: normal;
   font-display: swap;
 }`;
-  console.log(style.textContent);
   (doc.head ?? doc.documentElement).appendChild(style);
 };
 
