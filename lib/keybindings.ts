@@ -30,10 +30,9 @@ export const DEFAULT_KEY_BINDINGS: KeyBinding[] = [
 
   // 詳細ページ
   { key: "KeyC", actionId: "copyCaseNumber" },
-  { key: "KeyI", actionId: "copyReferenceId" },
-  { key: "C-KeyI", actionId: "copyReferenceIdPlain" },
-  { key: "S-KeyI", actionId: "copyReferenceIdWithCaseNumber" },
-  { key: "A-KeyI", actionId: "copyReferenceNumWithCaseNumber" },
+  { key: "KeyI", actionId: "copyReference" },
+  { key: "C-KeyI", actionId: "copyReferenceId" },
+  { key: "S-KeyI", actionId: "copyReferenceTsv" },
   { key: "KeyZ", actionId: "gotoZenbun" },
 
   // 全文ページ（zキーだが、gotoZenbunとはスコープが違うため別ActionIdが必要）

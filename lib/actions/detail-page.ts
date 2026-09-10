@@ -32,22 +32,16 @@ export const getDisplayedCaseNumber = (doc: Document): string => {
 /**
  * 文献番号取得処理
  */
-export const getDisplayedReferenceId = (doc: Document): string => {
-  const found = Array.from(
-    doc.querySelectorAll<HTMLElement>("tbody tr td:nth-child(1)"),
-  )
-    .map((el) => {
-      if (el.innerText !== "【文献番号】") return null;
-      const n = el.nextElementSibling as HTMLElement | null;
-      if (n?.innerText) {
-        return `LEX/DB\t${toHalfWidth(n.innerText)}`;
-      }
-      return null;
-    })
-    .filter((v): v is string => Boolean(v));
-
-  if (0 < found.length) {
-    return found[0]!;
+export const getDisplayedLexID = (doc: Document): string => {
+  const rows = Array.from(
+    doc.querySelectorAll<HTMLElement>(".ContentsShow tbody tr"),
+  );
+  for (const row of rows) {
+    const cells = Array.from(row.getElementsByTagName("td"));
+    const rowHeader = cells[0]!.innerText.trim();
+    if (rowHeader === "【文献番号】") {
+      return toHalfWidth(cells[1]?.innerText.trim() || "");
+    }
   }
   return "";
 };

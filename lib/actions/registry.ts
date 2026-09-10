@@ -1,4 +1,7 @@
-import { getDisplayedCaseNumber, getDisplayedReferenceId } from "./detail-page";
+import {
+  getDisplayedCaseNumber,
+  getDisplayedLexID as getDisplayedReferenceId,
+} from "./detail-page";
 import { makeOpenResultAction, openTopResult } from "./result-page";
 import {
   clearAllInputBox,
@@ -50,30 +53,20 @@ const copyCaseNumber = (ctx: HotkeyContext): void => {
   copyString(bodyDocument, "事件番号なし。" + refId.replaceAll("\t", ""));
 };
 
+const copyReference = (ctx: HotkeyContext): void => {
+  const refId = getDisplayedReferenceId(ctx.bodyDocument);
+  if (refId) copyString(ctx.bodyDocument, `LEX/DB ${refId}`);
+};
+
+const copyReferenceTsv = (ctx: HotkeyContext): void => {
+  const refId = getDisplayedReferenceId(ctx.bodyDocument);
+  const caseNum = getDisplayedCaseNumber(ctx.bodyDocument);
+  if (refId) copyString(ctx.bodyDocument, `LEX/DB\t${refId}\t${caseNum}`);
+};
+
 const copyReferenceId = (ctx: HotkeyContext): void => {
   const refId = getDisplayedReferenceId(ctx.bodyDocument);
   if (refId) copyString(ctx.bodyDocument, refId);
-};
-
-const copyReferenceIdPlain = (ctx: HotkeyContext): void => {
-  const refId = getDisplayedReferenceId(ctx.bodyDocument);
-  if (refId) copyString(ctx.bodyDocument, refId.replaceAll("\t", ""));
-};
-
-const copyReferenceIdWithCaseNumber = (ctx: HotkeyContext): void => {
-  const { bodyDocument } = ctx;
-  const refId = getDisplayedReferenceId(bodyDocument);
-  const caseNum = getDisplayedCaseNumber(bodyDocument);
-  if (refId && caseNum) copyString(bodyDocument, `${refId}\t${caseNum}`);
-};
-
-const copyReferenceNumWithCaseNumber = (ctx: HotkeyContext): void => {
-  const { bodyDocument } = ctx;
-  const refId = getDisplayedReferenceId(bodyDocument);
-  const caseNum = getDisplayedCaseNumber(bodyDocument);
-  if (refId && caseNum) {
-    copyString(bodyDocument, `${refId.split("\t")[1]}\t${caseNum}`);
-  }
 };
 
 const gotoZenbun = (ctx: HotkeyContext): void => {
@@ -203,29 +196,23 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     needsClipboard: false,
     run: (ctx) => copyCaseNumber(ctx),
   },
+  copyReference: {
+    label: "「LEX/DB ●●」形式で出典コピー",
+    scope: "detail",
+    needsClipboard: false,
+    run: (ctx) => copyReference(ctx),
+  },
+  copyReferenceTsv: {
+    label: "「LEX/DB」と文献番号と事件番号をタブ区切りでコピー",
+    scope: "detail",
+    needsClipboard: false,
+    run: (ctx) => copyReferenceTsv(ctx),
+  },
   copyReferenceId: {
     label: "文献番号をコピー",
     scope: "detail",
     needsClipboard: false,
     run: (ctx) => copyReferenceId(ctx),
-  },
-  copyReferenceIdPlain: {
-    label: "文献番号をコピー（タブなし）",
-    scope: "detail",
-    needsClipboard: false,
-    run: (ctx) => copyReferenceIdPlain(ctx),
-  },
-  copyReferenceIdWithCaseNumber: {
-    label: "文献番号と事件番号をコピー",
-    scope: "detail",
-    needsClipboard: false,
-    run: (ctx) => copyReferenceIdWithCaseNumber(ctx),
-  },
-  copyReferenceNumWithCaseNumber: {
-    label: "文献番号（先頭部除く）と事件番号をコピー",
-    scope: "detail",
-    needsClipboard: false,
-    run: (ctx) => copyReferenceNumWithCaseNumber(ctx),
   },
   gotoZenbun: {
     label: "全文ページへ移動",
