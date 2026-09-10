@@ -17,6 +17,7 @@ const injectFontFace = (doc: Document): void => {
   console.log(style.textContent);
   (doc.head ?? doc.documentElement).appendChild(style);
 };
+
 /** 審級関係セクションの開始見出し */
 const APPEAL_INSTANCE_HEADER = "【審級関係】";
 
