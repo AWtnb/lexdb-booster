@@ -23,6 +23,7 @@ export const DEFAULT_KEY_BINDINGS: KeyBinding[] = [
 
   // 検索結果ページ
   { key: "Enter", actionId: "openTopResult" },
+  { key: "Digit1", actionId: "openTopResult" },
 
   // 詳細ページ
   { key: "KeyC", actionId: "copyCaseNumber" },
