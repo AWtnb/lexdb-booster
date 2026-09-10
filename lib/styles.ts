@@ -62,15 +62,16 @@ export const applySearchResultPageStyles = (doc: Document): void => {
   injectFontFace(doc);
   Array.from(doc.getElementsByTagName("td")).forEach((elem) => {
     elem.style.fontFamily = FONT_NAME;
+    elem.style.height = "1.5em";
     if (elem.classList.contains("ListLow3")) {
       elem.style.background = "gold";
-      Array.from(elem.children).forEach((child) => {
-        if (child.tagName === "FONT") {
-          child.setAttribute("size", "");
-        }
-      });
-      elem.style.fontSize = "14px";
     }
+    Array.from(elem.children).forEach((child) => {
+      if (child.tagName === "FONT") {
+        child.setAttribute("size", "");
+      }
+      elem.style.fontSize = "14px";
+    });
   });
 };
 
