@@ -2,10 +2,11 @@ import { expandCourtAbbrev } from "../court";
 import { FREEWORD_IDS, setFreeWords } from "../free-words";
 import { parseKiriLines } from "../kiri";
 import {
-  expandGengo,
+  getYearCode,
   toFullWidthDigits,
-  toGengouAndTripletNum,
+  parseDateString,
   toHalfWidth,
+  parseCaseNumber,
 } from "../text-utils";
 import { setSelectBoxValue } from "../ui";
 import type { HotkeyAction, HotkeyActionWithClipboardText } from "../types";
@@ -34,6 +35,9 @@ export const clearAllInputBox: HotkeyAction = ({ bodyDocument }): void => {
   });
 };
 
+/**
+ * 「検索開始」ボタンを押す
+ */
 export const pressSubmitButton: HotkeyAction = ({ headWindow, url }) => {
   if (url.pathname.endsWith("SearchAll.aspx")) {
     headWindow.SubmitSearchBottom?.("search", "_parent");
@@ -45,48 +49,25 @@ export const pressSubmitButton: HotkeyAction = ({ headWindow, url }) => {
  */
 export const handleCaseNumberPaste: HotkeyActionWithClipboardText = (
   { bodyDocument },
-  caseNumber: string,
+  cb: string,
 ): void => {
-  caseNumber = caseNumber
-    .replace(/^[\?？]/, "")
-    .replace(/^（/, "")
-    .replace(/）$/, "");
-  const topCaseNum = toHalfWidth(caseNumber).split("、")[0]!;
-  const startParenPos = topCaseNum.indexOf("(");
-  if (startParenPos === -1) return;
-
-  const gengo = topCaseNum.substring(0, startParenPos).replace(/[0-9].+$/g, "");
-  const g = expandGengo(gengo.substring(0, 1)).toString();
-  const y = topCaseNum.substring(0, startParenPos).replace(/[^0-9]/g, "");
-  const endParenPos = topCaseNum.indexOf(")");
-  if (endParenPos === -1) return;
-
-  const category = topCaseNum.substring(startParenPos + 1, endParenPos);
-  const code = topCaseNum.substring(endParenPos + 1).replace(/[^0-9]/g, "");
+  const caseNumber = parseCaseNumber(cb);
+  if (!caseNumber) return;
+  const { code, year, sign, num } = caseNumber;
 
   setSelectBoxValue(
     bodyDocument,
     "InputJikenBangou_Control_JikenBangou_DropDownList",
-    g,
+    code,
   );
-  (
-    bodyDocument.getElementById(
-      "InputJikenBangou_Control_JikenBangouText0",
-    ) as HTMLInputElement
-  ).value = y;
-  (
-    bodyDocument.getElementById(
-      "InputJikenBangou_Control_JikenBangouText1",
-    ) as HTMLInputElement
-  ).value = category;
-  (
-    bodyDocument.getElementById(
-      "InputJikenBangou_Control_JikenBangouText2",
-    ) as HTMLInputElement
-  ).value = code;
-  bodyDocument
-    .getElementById("InputJikenBangou_Control_JikenBangouText0")
-    ?.scrollIntoView();
+
+  [
+    { id: "InputJikenBangou_Control_JikenBangouText0", value: year.toString() },
+    { id: "InputJikenBangou_Control_JikenBangouText1", value: sign },
+    { id: "InputJikenBangou_Control_JikenBangouText2", value: num.toString() },
+  ].forEach(({ id, value }) => {
+    (bodyDocument.getElementById(id) as HTMLInputElement).value = value;
+  });
 };
 
 /**
@@ -96,34 +77,7 @@ export const handleDatePaste: HotkeyActionWithClipboardText = (
   { bodyDocument },
   cb,
 ): void => {
-  const dateStr = toHalfWidth(cb);
-  const fmt = dateStr.replace(/日$/, "").replace(/[年月]/g, ".");
-  const elems = fmt.split(".").map((s) => s.replace(/[^0-9]/g, ""));
-  if (elems.length < 3) return;
-
-  const g = expandGengo(dateStr.substring(0, 1)).toString();
-
-  (
-    bodyDocument.getElementById(
-      "InputHanketuYMD_Control_HANKETU_YEAR0",
-    ) as HTMLInputElement
-  ).value = elems[0] || "";
-  (
-    bodyDocument.getElementById(
-      "InputHanketuYMD_Control_HANKETU_MONTH0",
-    ) as HTMLInputElement
-  ).value = elems[1] || "";
-  (
-    bodyDocument.getElementById(
-      "InputHanketuYMD_Control_HANKETU_DAY0",
-    ) as HTMLInputElement
-  ).value = elems[2] || "";
-
-  setSelectBoxValue(
-    bodyDocument,
-    "InputHanketuYMD_Control_NENGOU_DropDownList0",
-    g,
-  );
+  fillDateFields(bodyDocument, cb);
 };
 
 /**
@@ -162,18 +116,10 @@ export const handleBlankFreeWordFocus: HotkeyAction = ({
   }
 };
 
-export const setLexId = (doc: Document, lexId: string): void => {
-  (
-    doc.getElementById(
-      "InputHanketuYMD_Control_HanketuSubeteRadioButton",
-    ) as HTMLInputElement
-  ).click();
+const setLexId = (doc: Document, lexId: string): void => {
   (
     doc.getElementById("InputBunban_Control_BUNKEN00") as HTMLInputElement
   ).value = lexId;
-  doc
-    .getElementById("InputHanketuYMD_Control_HanketuSubeteRadioButton")
-    ?.scrollIntoView();
 };
 
 /**
@@ -193,29 +139,32 @@ export const handleLexIdPaste: HotkeyActionWithClipboardText = (
  * 日付欄への入力を共通化（指定モードに切り替えてから値をセット）
  */
 const fillDateFields = (doc: Document, date: string): void => {
-  const [g, a, b, c] = toGengouAndTripletNum(date);
+  const { code, y, m, d } = parseDateString(date);
+  console.log(code, y, m, d);
   (
     doc.getElementById(
       "InputHanketuYMD_Control_HanketuShiteiRadioButton",
     ) as HTMLInputElement
-  ).click();
+  ).checked = true;
 
-  setSelectBoxValue(doc, "InputHanketuYMD_Control_NENGOU_DropDownList0", g!);
-  (
-    doc.getElementById(
-      "InputHanketuYMD_Control_HANKETU_YEAR0",
-    ) as HTMLInputElement
-  ).value = a!;
-  (
-    doc.getElementById(
-      "InputHanketuYMD_Control_HANKETU_MONTH0",
-    ) as HTMLInputElement
-  ).value = b!;
-  (
-    doc.getElementById(
-      "InputHanketuYMD_Control_HANKETU_DAY0",
-    ) as HTMLInputElement
-  ).value = c!;
+  setSelectBoxValue(doc, "InputHanketuYMD_Control_NENGOU_DropDownList0", code);
+
+  [
+    {
+      id: "InputHanketuYMD_Control_HANKETU_YEAR0",
+      value: y,
+    },
+    {
+      id: "InputHanketuYMD_Control_HANKETU_MONTH0",
+      value: m,
+    },
+    {
+      id: "InputHanketuYMD_Control_HANKETU_DAY0",
+      value: d,
+    },
+  ].forEach(({ id, value }) => {
+    (doc.getElementById(id) as HTMLInputElement).value = value;
+  });
 };
 
 const SMOOTH_CSV_COL = {

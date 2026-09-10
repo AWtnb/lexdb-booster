@@ -1,5 +1,9 @@
 /**
  * 全角英数字・記号を半角に変換する
+ * 範囲：
+ *     - 全角アルファベット（`Ａ`～`Ｚ`、`ａ`～`ｚ`）
+ *     - 全角数字（`０`～`９`）
+ *     - 全角記号（`！`～`～`）
  */
 export const toHalfWidth = (str: string): string => {
   if (!str) return str;
@@ -23,30 +27,32 @@ export const getCurrentClipboardText = async (): Promise<string> => {
 };
 
 /**
- * 元号コードを展開する（令和→5、平成→4など）
+ * 元号コードを取得する（令和→5、平成→4など）
  */
-export const expandGengo = (g: string): number => {
-  const gengoMap: Record<string, number> = {
-    令: 5,
-    平: 4,
-    昭: 3,
-    大: 2,
-    明: 1,
-  };
-  return gengoMap[g] || 5;
+export const getYearCode = (s: string): string => {
+  if (s.startsWith("令和") || s.startsWith("令")) return "5";
+  if (s.startsWith("平成") || s.startsWith("平")) return "4";
+  if (s.startsWith("昭和") || s.startsWith("昭")) return "3";
+  if (s.startsWith("大正") || s.startsWith("大")) return "2";
+  if (s.startsWith("明治") || s.startsWith("明")) return "1";
+  return "5";
 };
 
 /**
  * 元号付き日付を元号コードと3つの数値に分解
  * @returns [元号コード, 年, 月, 日]
  */
-export const toGengouAndTripletNum = (s: string): string[] => {
-  const g = expandGengo(s.substring(0, 1));
-  const normalized = s
+export const parseDateString = (
+  s: string,
+): { code: string; y: string; m: string; d: string } => {
+  const code = getYearCode(s);
+  const [y, m, d] = toHalfWidth(s)
     .replace("元", "1")
     .replace(/^[^\d]+/, "")
-    .replace(/[^\d]+$/, "");
-  return [g.toString()].concat(normalized.split(/[^\d+]/).slice(0, 3));
+    .replace(/[^\d]+$/, "")
+    .replace(/[^\d]+/g, "_")
+    .split("_");
+  return { code, y: y || "", m: m || "", d: d || "" };
 };
 
 /**
@@ -56,4 +62,28 @@ export const getReferenceDetail = (str: string): string => {
   const m = str.match(/[0-9０-９]+/);
   if (!m) return str;
   return str.slice(m.index);
+};
+
+/**
+ * 文字列（の先頭）の事件番号をパースする
+ * 例：
+ *    平成２０年（行コ）第３１号→{ code: "4", year: 20, sign: "行コ", num: 31 }
+ */
+export const parseCaseNumber = (
+  str: string,
+): { code: string; year: number; sign: string; num: number } | null => {
+  const [top] = toHalfWidth(str)
+    .replace(/^\?/, "")
+    .replace(/^\(/, "")
+    .replace(/\)$/, "")
+    .split("、");
+  if (!top) return null;
+  const [fullYear, sign, fullNum] = top.replace(/[\(\)]/g, "_").split("_");
+  if (!fullYear || !sign || !fullNum) return null;
+  return {
+    code: getYearCode(fullYear),
+    year: parseInt(fullYear.replace(/[^0-9]/g, "")),
+    sign: sign,
+    num: parseInt(fullNum.replace(/[^0-9]/g, "")),
+  };
 };

@@ -107,6 +107,7 @@ const HEADING_BACKGROUND_MAP: Record<string, string> = {
   "【掲載文献】": "plum",
   "【備考】": "silver",
   "【裁判年月日】": "gold",
+  "【文献番号】": "skyblue",
 };
 
 /**

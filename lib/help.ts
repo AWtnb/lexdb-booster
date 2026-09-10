@@ -39,6 +39,7 @@ export const getActiveBindings = (
     const entry = ACTION_REGISTRY[actionId];
     if (!entry) return [];
     if (!activeScopes.has(entry.scope)) return [];
-    return [{ key: formatKeyString(key), label: entry.label }]; // ここだけ変更
+    if (key.startsWith("Numpad")) return [];
+    return [{ key: formatKeyString(key), label: entry.label }];
   });
 };

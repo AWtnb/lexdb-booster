@@ -22,10 +22,11 @@ export const DEFAULT_KEY_BINDINGS: KeyBinding[] = [
 
   // 検索結果ページ
   { key: "Enter", actionId: "openTopResult" },
-  ...([1, 2, 3, 4, 5, 6, 7, 8, 9] as const).map((n) => ({
-    key: `Digit${n}`,
-    actionId: `openResult${n}` as ActionId,
-  })),
+  { key: "NumpadEnter", actionId: "openTopResult" },
+  ...([1, 2, 3, 4, 5, 6, 7, 8, 9] as const).flatMap((n) => [
+    { key: `Digit${n}`, actionId: `openResult${n}` as ActionId },
+    { key: `Numpad${n}`, actionId: `openResult${n}` as ActionId },
+  ]),
 
   // 詳細ページ
   { key: "KeyC", actionId: "copyCaseNumber" },

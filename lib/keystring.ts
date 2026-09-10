@@ -71,7 +71,9 @@ export const formatKeyString = (key: string): string => {
     ? rest.slice(3)
     : rest.startsWith("Digit")
       ? rest.slice(5)
-      : rest;
+      : rest.startsWith("Numpad")
+        ? `テンキー${rest.slice(6)}`
+        : rest;
 
   parts.push(mainKey);
   return parts.join("+");
