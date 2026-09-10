@@ -3,6 +3,8 @@ import { handleHotkey } from "./hotkey-handler";
 import { applyDetailPageStyles, applySearchResultPageStyles } from "./styles";
 import { focusFrameBody } from "./ui";
 import { isDetailPage, isSearchResultPage } from "./page";
+import { toggleHelpOverlay } from "./ui";
+import { getActiveBindings } from "./help";
 import type { FrameWindow } from "./types";
 
 const RETRY_INTERVAL_MS = 3000;
@@ -56,6 +58,14 @@ const setupHotkeys = (): void => {
     bodyDocument.onkeyup = async (keyEvent) => {
       console.log({ key: keyEvent.key }, { code: keyEvent.code });
       const pressed = buildKeyString(keyEvent);
+
+      // ? キーでヘルプ表示トグル
+      if (pressed === "S-Slash") {
+        const bindings = getActiveBindings(url);
+        toggleHelpOverlay(bodyDocument, bindings);
+        return;
+      }
+
       const target = keyEvent.target as HTMLElement;
       const isInputableElem =
         target.tagName === "TEXTAREA" ||

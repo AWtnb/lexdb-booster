@@ -117,3 +117,75 @@ export const setSelectBoxValue = (
   const changeEvent = new Event("change", { bubbles: true });
   selectElement.dispatchEvent(changeEvent);
 };
+
+const HELP_OVERLAY_ID = "extension-help-overlay";
+
+/**
+ * 現在ページのキーバインド一覧オーバーレイを左下に表示/非表示トグル
+ */
+export const toggleHelpOverlay = (
+  doc: Document,
+  bindings: { key: string; label: string }[],
+): void => {
+  const existing = doc.getElementById(HELP_OVERLAY_ID);
+  if (existing !== null) {
+    existing.remove();
+    return;
+  }
+
+  const overlay = doc.createElement("div");
+  overlay.id = HELP_OVERLAY_ID;
+  overlay.style.cssText = [
+    "position:fixed",
+    "bottom:20px",
+    "left:20px",
+    "background:rgba(0,0,0,0.75)",
+    "color:white",
+    "padding:12px 16px",
+    "border-radius:8px",
+    "z-index:9999",
+    "font-size:13px",
+    "line-height:1.8",
+    "pointer-events:none",
+    "max-height:80vh",
+    "overflow-y:auto",
+  ].join(";");
+
+  const title = doc.createElement("div");
+  title.textContent = "⌨ キーボードショートカット";
+  title.style.cssText = [
+    "font-weight:bold",
+    "margin-bottom:6px",
+    "font-size:14px",
+    "border-bottom:1px solid rgba(255,255,255,0.4)",
+    "padding-bottom:4px",
+  ].join(";");
+  overlay.appendChild(title);
+
+  for (const { key, label } of bindings) {
+    const row = doc.createElement("div");
+    row.style.cssText = "display:flex;gap:12px;align-items:baseline";
+
+    const keyBadge = doc.createElement("span");
+    keyBadge.textContent = key;
+    keyBadge.style.cssText = [
+      "font-family:monospace",
+      "background:rgba(255,255,255,0.15)",
+      "padding:1px 6px",
+      "border-radius:4px",
+      "min-width:80px",
+      "display:inline-block",
+      "text-align:center",
+      "flex-shrink:0",
+    ].join(";");
+
+    const labelEl = doc.createElement("span");
+    labelEl.textContent = label;
+
+    row.appendChild(keyBadge);
+    row.appendChild(labelEl);
+    overlay.appendChild(row);
+  }
+
+  doc.body.appendChild(overlay);
+};
