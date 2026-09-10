@@ -23,10 +23,9 @@ export const DEFAULT_KEY_BINDINGS: KeyBinding[] = [
 
   // 検索結果ページ
   { key: "Enter", actionId: "openTopResult" },
-  { key: "Digit1", actionId: "openTopResult" },
-  ...Array.from({ length: 9 }, (_, i) => ({
-    key: `Digit${i + 1}`,
-    actionId: `openResult${i + 1}` as ActionId,
+  ...([1, 2, 3, 4, 5, 6, 7, 8, 9] as const).map((n) => ({
+    key: `Digit${n}`,
+    actionId: `openResult${n}` as ActionId,
   })),
 
   // 詳細ページ
