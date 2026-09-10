@@ -41,3 +41,38 @@ export const normalizeKeyString = (raw: string): string => {
 
   return prefix + mainKey;
 };
+
+/**
+ * 修飾キープレフィックスと表示名の対応
+ */
+const MODIFIER_DISPLAY: { prefix: string; display: string }[] = [
+  { prefix: "C-", display: "Ctrl" },
+  { prefix: "A-", display: "Alt" },
+  { prefix: "S-", display: "Shift" },
+];
+
+/**
+ * 内部キー文字列を人が読める形式に変換する
+ * 例: "A-S-KeyF" → "Alt+Shift+F"
+ *     "Digit3"   → "3"
+ *     "Enter"    → "Enter"
+ */
+export const formatKeyString = (key: string): string => {
+  const parts: string[] = [];
+
+  let rest = key;
+  for (const { prefix, display } of MODIFIER_DISPLAY) {
+    if (!rest.startsWith(prefix)) continue;
+    parts.push(display);
+    rest = rest.slice(prefix.length);
+  }
+
+  const mainKey = rest.startsWith("Key")
+    ? rest.slice(3)
+    : rest.startsWith("Digit")
+      ? rest.slice(5)
+      : rest;
+
+  parts.push(mainKey);
+  return parts.join("+");
+};

@@ -164,7 +164,8 @@ export const toggleHelpOverlay = (
 
   for (const { key, label } of bindings) {
     const row = doc.createElement("div");
-    row.style.cssText = "display:flex;gap:12px;align-items:baseline";
+    row.style.cssText =
+      "display:flex;gap:12px;align-items:baseline;margin:8px 0;";
 
     const keyBadge = doc.createElement("span");
     keyBadge.textContent = key;

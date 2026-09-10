@@ -7,6 +7,7 @@ import {
   isZenbunPage,
 } from "./page";
 import type { PageScope } from "./actions/registry";
+import { formatKeyString } from "./keystring";
 
 /**
  * URL から現在ページが該当するスコープ一覧を返す
@@ -38,6 +39,6 @@ export const getActiveBindings = (
     const entry = ACTION_REGISTRY[actionId];
     if (!entry) return [];
     if (!activeScopes.has(entry.scope)) return [];
-    return [{ key, label: entry.label }];
+    return [{ key: formatKeyString(key), label: entry.label }]; // ここだけ変更
   });
 };

@@ -3,7 +3,6 @@ import type { ActionId, KeyBinding } from "./types";
 /**
  * デフォルトのキーバインド定義
  * hotkey-handler.tsに以前ハードコードされていた対応関係をそのまま移植したもの
- * ユーザーが未設定の場合、この内容が使われる
  */
 export const DEFAULT_KEY_BINDINGS: KeyBinding[] = [
   // 全ページ共通
