@@ -22,7 +22,7 @@ export const DEFAULT_KEY_BINDINGS: KeyBinding[] = [
   { key: "KeyV", actionId: "pasteKiri" },
 
   // 検索結果ページ
-  { key: "Space", actionId: "openTopResult" },
+  { key: "Enter", actionId: "openTopResult" },
 
   // 詳細ページ
   { key: "KeyC", actionId: "copyCaseNumber" },

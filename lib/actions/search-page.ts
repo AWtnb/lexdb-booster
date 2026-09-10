@@ -36,7 +36,6 @@ export const clearAllInputBox: HotkeyAction = ({ bodyDocument }): void => {
 
 export const pressSubmitButton: HotkeyAction = ({ headWindow, url }) => {
   if (url.pathname.endsWith("SearchAll.aspx")) {
-    console.log(headWindow.SubmitSearchBottom);
     headWindow.SubmitSearchBottom?.("search", "_parent");
   }
 };

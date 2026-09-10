@@ -70,29 +70,12 @@ export const DISTRICT_COURTS = [
  * 裁判所の略称を完全表記に展開する（例: "東京地" → "東京地方裁判所"）
  */
 export const expandCourtAbbrev = (s: string): string => {
-  // 複数あった場合
-  if (s.startsWith("(")) {
-    const candidates = Array.from(
-      new Set(s.replace(/^\(/, "").replace(/\)$/, "").split(" or ")),
-    );
-    if (candidates.length === 1) {
-      const c = candidates[0];
-      if (c === "最一小") return "最高裁判所第一小法廷";
-      if (c === "最二小") return "最高裁判所第二小法廷";
-      if (c === "最三小") return "最高裁判所第三小法廷";
-      if (c === "最大") return "最高裁判所大法廷";
-      return c || "";
-    }
-
-    if (candidates.every((c) => c.startsWith("最"))) {
-      return "最高裁判所";
-    }
-
-    return "";
-  }
-
   // 最高裁判所の場合
   if (s.startsWith("最")) {
+    if (s === "最一小") return "最高裁判所第一小法廷";
+    if (s === "最二小") return "最高裁判所第二小法廷";
+    if (s === "最三小") return "最高裁判所第三小法廷";
+    if (s === "最大") return "最高裁判所大法廷";
     return "最高裁判所";
   }
 
