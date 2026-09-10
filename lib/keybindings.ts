@@ -1,4 +1,4 @@
-import type { KeyBinding } from "./types";
+import type { ActionId, KeyBinding } from "./types";
 
 /**
  * デフォルトのキーバインド定義
@@ -24,6 +24,10 @@ export const DEFAULT_KEY_BINDINGS: KeyBinding[] = [
   // 検索結果ページ
   { key: "Enter", actionId: "openTopResult" },
   { key: "Digit1", actionId: "openTopResult" },
+  ...Array.from({ length: 9 }, (_, i) => ({
+    key: `Digit${i + 1}`,
+    actionId: `openResult${i + 1}` as ActionId,
+  })),
 
   // 詳細ページ
   { key: "KeyC", actionId: "copyCaseNumber" },

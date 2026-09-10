@@ -1,5 +1,5 @@
 import { getDisplayedCaseNumber, getDisplayedReferenceId } from "./detail-page";
-import { openTopResult } from "./result-page";
+import { makeOpenResultAction, openTopResult } from "./result-page";
 import {
   clearAllInputBox,
   handleCaseNumberPaste,
@@ -12,7 +12,7 @@ import {
   pressSubmitButton,
 } from "./search-page";
 import { copyString } from "../ui";
-import type { ActionId, HotkeyContext } from "../types";
+import type { ActionId, HotkeyContext, OpenResultId } from "../types";
 
 /** アクションが有効なページスコープ */
 export type PageScope =
@@ -101,6 +101,21 @@ const gotoSearchResults = (ctx: HotkeyContext): void => {
 const goHome = (): void => {
   window.location.href = "https://lex.lawlibrary.jp/lexbin/SearchAll.aspx";
 };
+
+const openResultEntries = ([1, 2, 3, 4, 5, 6, 7, 8, 9] as const).reduce<
+  Pick<Record<ActionId, ActionEntry>, OpenResultId>
+>(
+  (acc, n) => {
+    acc[`openResult${n}`] = {
+      label: `検索結果の${n}件目を開く`,
+      scope: "searchResult",
+      needsClipboard: false,
+      run: makeOpenResultAction(n - 1),
+    };
+    return acc;
+  },
+  {} as Pick<Record<ActionId, ActionEntry>, OpenResultId>,
+);
 
 /**
  * ActionIdごとの実体定義
@@ -236,4 +251,5 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     needsClipboard: false,
     run: (ctx) => openTopResult(ctx),
   },
+  ...openResultEntries,
 };
