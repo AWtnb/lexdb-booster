@@ -6,6 +6,7 @@ import { isDetailPage, isSearchResultPage } from "./page";
 import { toggleHelpOverlay } from "./ui";
 import { getActiveBindings } from "./help";
 import type { FrameWindow } from "./types";
+import { getSyoshiAnchors, openTopResult } from "./actions/result-page";
 
 const RETRY_INTERVAL_MS = 3000;
 const MAX_RETRIES = 5;
@@ -84,6 +85,22 @@ const setupHotkeys = (): void => {
         bodyDocument,
       });
     };
+
+    if (isSearchResultPage(url)) {
+      const anchors = getSyoshiAnchors(bodyDocument);
+      // 2つで1セット（書誌リンク + 何か）なので、1件 = anchors.length === 2
+      if (anchors.length === 2) {
+        openTopResult({
+          url,
+          keyEvent: null as unknown as KeyboardEvent,
+          isInputableElem: false,
+          headWindow,
+          headDocument,
+          bodyWindow,
+          bodyDocument,
+        });
+      }
+    }
 
     bodyWindow._hotkeyInitialized = true;
     console.log("ホットキーの設定が完了しました");

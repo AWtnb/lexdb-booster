@@ -1,9 +1,10 @@
 import type { HotkeyAction, HotkeyContext } from "../types";
 
+export const getSyoshiAnchors = (doc: Document): Element[] =>
+  Array.from(doc.querySelectorAll("tr > td[rowspan='3'] a"));
+
 const openResult = (ctx: HotkeyContext, index: number): void => {
-  const anchors = Array.from(
-    ctx.bodyDocument.querySelectorAll("tr > td[rowspan='3'] a"),
-  );
+  const anchors = getSyoshiAnchors(ctx.bodyDocument);
   if (!anchors) return;
   const target = anchors[index * 2];
   const js = target?.getAttribute("href");
