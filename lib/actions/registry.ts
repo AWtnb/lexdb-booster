@@ -50,7 +50,7 @@ const copyCaseNumber = (ctx: HotkeyContext): void => {
     return;
   }
   const refId = getDisplayedReferenceId(bodyDocument);
-  copyString(bodyDocument, "事件番号なし。" + refId.replaceAll("\t", ""));
+  copyString(bodyDocument, `事件番号なし。LEX/DB ${refId}`);
 };
 
 const copyReference = (ctx: HotkeyContext): void => {

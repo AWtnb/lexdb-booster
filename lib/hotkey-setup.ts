@@ -59,13 +59,6 @@ const setupHotkeys = (): void => {
       console.log({ key: keyEvent.key }, { code: keyEvent.code });
       const pressed = buildKeyString(keyEvent);
 
-      // ? キーでヘルプ表示トグル
-      if (pressed === "S-Slash") {
-        const bindings = getActiveBindings(url);
-        toggleHelpOverlay(bodyDocument, bindings);
-        return;
-      }
-
       const target = keyEvent.target as HTMLElement;
       const isInputableElem =
         target.tagName === "TEXTAREA" ||
@@ -73,6 +66,13 @@ const setupHotkeys = (): void => {
           !["checkbox", "radio"].includes(
             (target as HTMLInputElement).type.toLowerCase(),
           ));
+
+      // ? キーでヘルプ表示トグル
+      if (pressed === "KeyQ" && !isInputableElem) {
+        const bindings = getActiveBindings(url);
+        toggleHelpOverlay(bodyDocument, bindings);
+        return;
+      }
 
       await handleHotkey(pressed, {
         url,
