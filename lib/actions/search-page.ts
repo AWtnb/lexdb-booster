@@ -7,6 +7,7 @@ import {
   parseDateString,
   toHalfWidth,
   parseCaseNumber,
+  trimUncertainPrefix,
 } from "../text-utils";
 import { setSelectBoxValue } from "../ui";
 import type { HotkeyAction, HotkeyActionWithClipboardText } from "../types";
@@ -186,7 +187,7 @@ export const handleSmoothCsvPaste: HotkeyActionWithClipboardText = (
   const line = toHalfWidth(cb);
   const fields = line
     .split("\t")
-    .map((s) => s.replace(/^[\?？]/, ""))
+    .map(trimUncertainPrefix)
     .map((s) => s.split("=").slice(-1)[0]);
 
   const court = fields[SMOOTH_CSV_COL["COURT"]]!;
