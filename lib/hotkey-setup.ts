@@ -67,7 +67,7 @@ const setupHotkeys = (): void => {
             (target as HTMLInputElement).type.toLowerCase(),
           ));
 
-      // ? キーでヘルプ表示トグル
+      // Qキーでヘルプ表示トグル
       if (pressed === "KeyQ" && !isInputableElem) {
         const bindings = getActiveBindings(url);
         toggleHelpOverlay(bodyDocument, bindings);
