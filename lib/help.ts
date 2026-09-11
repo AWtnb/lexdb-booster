@@ -40,6 +40,7 @@ export const getActiveBindings = (
     if (!entry) return [];
     if (!activeScopes.has(entry.scope)) return [];
     if (key.startsWith("Numpad")) return [];
+    if (key.endsWith("V")) return [];
     return [{ key: formatKeyString(key), label: entry.label }];
   });
 };
