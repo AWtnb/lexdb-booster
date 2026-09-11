@@ -7,12 +7,12 @@ import {
   clearAllInputBox,
   handleCaseNumberPaste,
   handleDatePaste,
-  handleFreeWordFocus,
-  handleBlankFreeWordFocus,
+  handleFreeWordFocus as freeWordFocus,
   handleKiriPaste,
   handleLexIdPaste,
   handleSmoothCsvPaste,
   pressSubmitButton,
+  cycleFreeWord,
 } from "./search-page";
 import { copyString } from "../ui";
 import type { ActionId, HotkeyContext, OpenResultId } from "../types";
@@ -160,16 +160,16 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     },
   },
   focusFreeWord: {
-    label: "フリーワード欄にフォーカス（末尾）",
+    label: "フリーワード欄（末尾）にフォーカス",
     scope: "search",
     needsClipboard: false,
-    run: (ctx) => handleFreeWordFocus(ctx),
+    run: (ctx) => freeWordFocus(ctx),
   },
-  focusBlankFreeWord: {
-    label: "フリーワード欄にフォーカス（空欄）",
+  cycleFreeWord: {
+    label: "ANDフリーワード欄にフォーカス",
     scope: "search",
     needsClipboard: false,
-    run: (ctx) => handleBlankFreeWordFocus(ctx),
+    run: (ctx) => cycleFreeWord(ctx),
   },
   pasteSmoothCsv: {
     label: "SmoothCSVを貼り付けて検索",

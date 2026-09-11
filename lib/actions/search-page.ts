@@ -85,36 +85,48 @@ export const handleDatePaste: HotkeyActionWithClipboardText = (
  * フリーワードの最後の入力済み欄にフォーカスする
  */
 export const handleFreeWordFocus: HotkeyAction = ({ bodyDocument }): void => {
-  for (let i = 0; i < FREEWORD_IDS.length; i++) {
-    const elem = bodyDocument.getElementById(
-      FREEWORD_IDS[i]!,
-    ) as HTMLInputElement;
-    if (elem.value !== "") continue;
+  const blankElemIds = FREEWORD_IDS.filter((id) => {
+    const elem = bodyDocument.getElementById(id) as HTMLInputElement;
+    return elem.value !== "";
+  });
 
-    if (i === 0) {
-      elem.focus();
-      break;
-    }
-    (
-      bodyDocument.getElementById(FREEWORD_IDS[i - 1]!) as HTMLInputElement
-    ).select();
-    break;
+  if (blankElemIds.length < 1) return;
+
+  const lastId = blankElemIds.pop();
+  if (lastId) {
+    (bodyDocument.getElementById(lastId) as HTMLInputElement).select();
   }
 };
 
 /**
- * フリーワードの空いている欄にフォーカスする
+ * フリーワードのAND欄へのフォーカスをサイクルする
  */
-export const handleBlankFreeWordFocus: HotkeyAction = ({
-  bodyDocument,
-}): void => {
-  for (const elemId of FREEWORD_IDS) {
-    const elem = bodyDocument.getElementById(elemId) as HTMLInputElement;
-    if (elem.value === "") {
-      elem.focus();
-      break;
-    }
+export const cycleFreeWord: HotkeyAction = ({ bodyDocument }): void => {
+  const activeElem = bodyDocument.activeElement;
+  if (!activeElem) return;
+
+  const idx = FREEWORD_IDS.indexOf(activeElem.id);
+  if (0 <= idx) {
+    const nextIdx = (idx + 1) % FREEWORD_IDS.length;
+    bodyDocument.getElementById(FREEWORD_IDS[nextIdx]!)?.focus();
+    return;
   }
+
+  const activeId = activeElem.id;
+  if (!activeId.startsWith("InputFreeKeyword_Control_KEYWORD")) {
+    bodyDocument.getElementById(FREEWORD_IDS[0]!)?.focus();
+    return;
+  }
+
+  const current = parseInt(
+    activeId.replace("InputFreeKeyword_Control_KEYWORD", ""),
+  );
+
+  // 現在の行の先頭インデックス（KEYWORD00=0, KEYWORD05=1, ...）を求め、次へ進める
+  // 各行は5列区切りなので、Math.floorで所属行を特定
+  const rowIdx = Math.floor(current / 5);
+  const nextRowIdx = (rowIdx + 1) % FREEWORD_IDS.length;
+  bodyDocument.getElementById(FREEWORD_IDS[nextRowIdx]!)?.focus();
 };
 
 const setLexId = (doc: Document, lexId: string): void => {

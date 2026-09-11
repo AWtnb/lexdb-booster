@@ -42,7 +42,7 @@ export type ActionId =
   | "pasteDate"
   | "pasteLexId"
   | "focusFreeWord"
-  | "focusBlankFreeWord"
+  | "cycleFreeWord"
   | "pasteSmoothCsv"
   | "pasteKiri"
   | "copyCaseNumber"

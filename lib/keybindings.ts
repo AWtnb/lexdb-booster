@@ -16,7 +16,7 @@ export const DEFAULT_KEY_BINDINGS: KeyBinding[] = [
   { key: "KeyD", actionId: "pasteDate" },
   { key: "KeyL", actionId: "pasteLexId" },
   { key: "KeyF", actionId: "focusFreeWord" },
-  { key: "S-KeyF", actionId: "focusBlankFreeWord" },
+  { key: "A-KeyN", actionId: "cycleFreeWord" },
   { key: "A-KeyV", actionId: "pasteSmoothCsv" },
   { key: "KeyV", actionId: "pasteKiri" },
 
