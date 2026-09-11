@@ -5,14 +5,14 @@ import {
 import { makeOpenResultAction, openTopResult } from "./result-page";
 import {
   clearAllInputBox,
-  handleCaseNumberPaste,
-  handleDatePaste,
-  handleFreeWordFocus as freeWordFocus,
-  handleKiriPaste,
-  handleLexIdPaste,
-  handleSmoothCsvPaste,
-  pressSubmitButton,
   cycleFreeWord,
+  focusFreeWord,
+  pasteCaseNumber,
+  pasteDate,
+  pasteKiri,
+  pasteLexId,
+  pasteSmoothCsv,
+  pressSubmitButton,
 } from "./search-page";
 import { copyString } from "../ui";
 import type { ActionId, HotkeyContext, OpenResultId } from "../types";
@@ -139,7 +139,7 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     needsClipboard: true,
     run: (ctx, cb) => {
       clearAllInputBox(ctx);
-      handleCaseNumberPaste(ctx, cb);
+      pasteCaseNumber(ctx, cb);
       pressSubmitButton(ctx);
     },
   },
@@ -147,7 +147,7 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     label: "日付を貼り付け",
     scope: "search",
     needsClipboard: true,
-    run: (ctx, cb) => handleDatePaste(ctx, cb),
+    run: (ctx, cb) => pasteDate(ctx, cb),
   },
   pasteLexId: {
     label: "LEX文献番号を貼り付けて検索",
@@ -155,7 +155,7 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     needsClipboard: true,
     run: (ctx, cb) => {
       clearAllInputBox(ctx);
-      handleLexIdPaste(ctx, cb);
+      pasteLexId(ctx, cb);
       pressSubmitButton(ctx);
     },
   },
@@ -163,7 +163,7 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     label: "フリーワード欄（末尾）にフォーカス",
     scope: "search",
     needsClipboard: false,
-    run: (ctx) => freeWordFocus(ctx),
+    run: (ctx) => focusFreeWord(ctx),
   },
   cycleFreeWord: {
     label: "ANDフリーワード欄にフォーカス",
@@ -177,7 +177,7 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     needsClipboard: true,
     run: (ctx, cb) => {
       clearAllInputBox(ctx);
-      handleSmoothCsvPaste(ctx, cb);
+      pasteSmoothCsv(ctx, cb);
       pressSubmitButton(ctx);
     },
   },
@@ -187,7 +187,7 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     needsClipboard: true,
     run: (ctx, cb) => {
       clearAllInputBox(ctx);
-      return handleKiriPaste(ctx, cb);
+      pasteKiri(ctx, cb);
     },
   },
   copyCaseNumber: {

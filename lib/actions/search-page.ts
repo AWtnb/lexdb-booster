@@ -48,7 +48,7 @@ export const pressSubmitButton: HotkeyAction = ({ headWindow, url }) => {
 /**
  * 事件番号貼り付け処理
  */
-export const handleCaseNumberPaste: HotkeyActionWithClipboardText = (
+export const pasteCaseNumber: HotkeyActionWithClipboardText = (
   { bodyDocument },
   cb: string,
 ): void => {
@@ -74,7 +74,7 @@ export const handleCaseNumberPaste: HotkeyActionWithClipboardText = (
 /**
  * 日付貼り付け処理
  */
-export const handleDatePaste: HotkeyActionWithClipboardText = (
+export const pasteDate: HotkeyActionWithClipboardText = (
   { bodyDocument },
   cb,
 ): void => {
@@ -84,7 +84,7 @@ export const handleDatePaste: HotkeyActionWithClipboardText = (
 /**
  * フリーワードの最後の入力済み欄にフォーカスする
  */
-export const handleFreeWordFocus: HotkeyAction = ({ bodyDocument }): void => {
+export const focusFreeWord: HotkeyAction = ({ bodyDocument }): void => {
   const blankElemIds = FREEWORD_IDS.filter((id) => {
     const elem = bodyDocument.getElementById(id) as HTMLInputElement;
     return elem.value !== "";
@@ -138,7 +138,7 @@ const setLexId = (doc: Document, lexId: string): void => {
 /**
  * LEX文献番号を貼り付ける処理
  */
-export const handleLexIdPaste: HotkeyActionWithClipboardText = (
+export const pasteLexId: HotkeyActionWithClipboardText = (
   { bodyDocument },
   cb,
 ): void => {
@@ -191,7 +191,7 @@ const SMOOTH_CSV_COL = {
  * 事件番号調査用のCSVから一括貼り付け
  * SmoothCSVからのコピーを前提に、列はタブ区切りで扱う
  */
-export const handleSmoothCsvPaste: HotkeyActionWithClipboardText = (
+export const pasteSmoothCsv: HotkeyActionWithClipboardText = (
   ctx,
   cb,
 ): void => {
@@ -217,7 +217,7 @@ export const handleSmoothCsvPaste: HotkeyActionWithClipboardText = (
     /(明治|大正|昭和|平成|令和)([0-9]{1,2}|元)年\(.{1,3}\)第[0-9]+号/,
   );
   if (caseNumberMatch) {
-    handleCaseNumberPaste(ctx, caseNumberMatch[0]);
+    pasteCaseNumber(ctx, caseNumberMatch[0]);
   }
 
   try {
@@ -234,7 +234,7 @@ export const handleSmoothCsvPaste: HotkeyActionWithClipboardText = (
 /**
  * 桐の行コピーから一括貼り付け
  */
-export const handleKiriPaste: HotkeyActionWithClipboardText = (
+export const pasteKiri: HotkeyActionWithClipboardText = (
   { bodyDocument },
   cb: string,
 ): void => {
