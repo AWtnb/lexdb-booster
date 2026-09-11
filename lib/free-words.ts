@@ -17,27 +17,28 @@ export const FREEWORD_IDS = [
 export const setFreeWords = (
   doc: Document,
   court: string,
-  references: string[],
+  words: string[],
 ): void => {
-  const freewords = [court];
   const reg = /\(([明大昭平令][0-9０-９]{1,2})\)(.*)/;
 
-  references.forEach((s) => {
-    const result = reg.exec(s);
+  const freewords = words.flatMap((word) => {
+    const result = reg.exec(word);
     if (result) {
-      freewords.push(`（${result[1]}）${result[2]}`);
-      return;
+      return [`（${result[1]}）${result[2]}`];
     }
-    const detail = getReferenceDetail(s);
+    const detail = getReferenceDetail(word);
     if (detail !== "") {
-      freewords.push(toFullWidthDigits(detail));
+      return [toFullWidthDigits(detail)];
     }
+    return [];
   });
 
-  for (let i = 0; i < freewords.length && i < FREEWORD_IDS.length - 1; i++) {
-    const word = freewords[i]!;
-    const elem = doc.getElementById(FREEWORD_IDS[i]!) as HTMLInputElement;
-    elem.value = word;
-    elem.focus();
+  if (court) {
+    freewords.unshift(court);
   }
+
+  freewords.slice(0, 5).forEach((w, i) => {
+    const elem = doc.getElementById(FREEWORD_IDS[i]!) as HTMLInputElement;
+    elem.value = w;
+  });
 };
