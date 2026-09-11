@@ -73,12 +73,16 @@ export const parseCaseNumber = (
   str: string,
 ): { code: string; year: number; sign: string; num: number } | null => {
   const [top] = toHalfWidth(str)
+    .replace("元年", "1年")
     .replace(/^\?/, "")
     .replace(/^\(/, "")
     .replace(/\)$/, "")
     .split("、");
   if (!top) return null;
-  const [fullYear, sign, fullNum] = top.replace(/[\(\)]/g, "_").split("_");
+  const [fullYear, sign, fullNum] = top
+    .replace(/号.+$/, "号")
+    .replace(/[\(\)]/g, "_")
+    .split("_");
   if (!fullYear || !sign || !fullNum) return null;
   return {
     code: getYearCode(fullYear),
