@@ -1,6 +1,5 @@
 import { expandCourtAbbrev } from "../court";
 import { FREEWORD_IDS, setFreeWords } from "../free-words";
-import { parseKiriLines } from "../kiri";
 import {
   getYearCode,
   toFullWidthDigits,
@@ -199,7 +198,9 @@ export const pasteSmoothCsv: HotkeyActionWithClipboardText = (
   const line = toHalfWidth(cb);
   const fields = line
     .split("\t")
-    .map(trimUncertainPrefix)
+    .map((t) => {
+      return t.startsWith("?") || t.startsWith(">") ? "" : t;
+    })
     .map((s) => s.split("=").slice(-1)[0]);
 
   const court = fields[SMOOTH_CSV_COL["COURT"]]!;
@@ -229,35 +230,4 @@ export const pasteSmoothCsv: HotkeyActionWithClipboardText = (
   const courtExpanded = expandCourtAbbrev(court);
   const fullwidthDetail = toFullWidthDigits(detail);
   setFreeWords(bodyDocument, courtExpanded, [fullwidthDetail]);
-};
-
-/**
- * 桐の行コピーから一括貼り付け
- */
-export const pasteKiri: HotkeyActionWithClipboardText = (
-  { bodyDocument },
-  cb: string,
-): void => {
-  const kiri = parseKiriLines(cb);
-
-  if (kiri.src) {
-    const lexIdMatch = kiri.src.match(/\d{8}$/);
-    if (lexIdMatch) {
-      setLexId(bodyDocument, lexIdMatch[0]);
-      return;
-    }
-  }
-
-  if (!kiri.date) return;
-
-  try {
-    fillDateFields(bodyDocument, kiri.date);
-    setFreeWords(
-      bodyDocument,
-      expandCourtAbbrev(kiri.place.slice(0, -1)),
-      kiri.src.split("・"),
-    );
-  } catch (error) {
-    console.error("桐貼り付けエラー:", error);
-  }
 };

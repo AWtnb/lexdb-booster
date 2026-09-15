@@ -44,7 +44,6 @@ export type ActionId =
   | "focusFreeWord"
   | "cycleFreeWord"
   | "pasteSmoothCsv"
-  | "pasteKiri"
   | "copyCaseNumber"
   | "copyReference"
   | "copyReferenceTsv"
@@ -62,13 +61,4 @@ export type ActionId =
 export type KeyBinding = {
   key: string;
   actionId: ActionId;
-};
-
-/**
- * 桐の行コピーをパースした結果
- */
-export type KiriLine = {
-  place: string;
-  date: string;
-  src: string;
 };

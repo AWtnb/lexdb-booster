@@ -9,7 +9,6 @@ import {
   focusFreeWord,
   pasteCaseNumber,
   pasteDate,
-  pasteKiri,
   pasteLexId,
   pasteSmoothCsv,
   pressSubmitButton,
@@ -179,15 +178,6 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
       clearAllInputBox(ctx);
       pasteSmoothCsv(ctx, cb);
       pressSubmitButton(ctx);
-    },
-  },
-  pasteKiri: {
-    label: "桐の行コピーを貼り付け",
-    scope: "search",
-    needsClipboard: true,
-    run: (ctx, cb) => {
-      clearAllInputBox(ctx);
-      pasteKiri(ctx, cb);
     },
   },
   copyCaseNumber: {
