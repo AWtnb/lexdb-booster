@@ -1,13 +1,13 @@
-import { getCurrentClipboardText } from "./text-utils";
+import { getCurrentClipboardText } from "../text-utils";
 import {
   isDetailPage,
   isSearchResultPage,
   isSearchPage,
   isZenbunPage,
-} from "./page";
-import { ACTION_REGISTRY } from "./actions/registry";
-import type { ActionEntry } from "./actions/registry";
-import type { HotkeyContext, KeyBinding } from "./types";
+} from "../page";
+import { ACTION_REGISTRY } from "../actions/registry";
+import type { ActionEntry } from "../actions/registry";
+import type { HotkeyContext, KeyBinding } from "../types";
 import { DEFAULT_KEY_BINDINGS } from "./keybindings";
 
 /**

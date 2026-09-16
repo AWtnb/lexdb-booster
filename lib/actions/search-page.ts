@@ -198,9 +198,7 @@ export const pasteSmoothCsv: HotkeyActionWithClipboardText = (
   const line = toHalfWidth(cb);
   const fields = line
     .split("\t")
-    .map((t) => {
-      return t.startsWith("?") || t.startsWith(">") ? "" : t;
-    })
+    .map((t) => (t.startsWith("?") ? "" : t))
     .map((s) => s.split("=").slice(-1)[0]);
 
   const court = fields[SMOOTH_CSV_COL["COURT"]]!;

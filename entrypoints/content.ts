@@ -1,5 +1,5 @@
 import { defineContentScript } from "wxt/utils/define-content-script";
-import { initializeScript } from "@/lib/hotkey-setup";
+import { initializeScript } from "@/lib/hotkey/hotkey-setup";
 
 /**
  * ログインや遷移確認だけの単純な画面では、

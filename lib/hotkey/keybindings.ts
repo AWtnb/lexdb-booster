@@ -1,4 +1,4 @@
-import type { ActionId, KeyBinding } from "./types";
+import type { ActionId, KeyBinding } from "../types";
 
 /**
  * デフォルトのキーバインド定義
