@@ -1,4 +1,5 @@
 import { toHalfWidth } from "../text-utils";
+import type { HotkeyAction } from "../types";
 import { copyString } from "../ui";
 
 /**
@@ -47,43 +48,43 @@ export const getDisplayedLexID = (doc: Document): string => {
   return "";
 };
 
-export const copyCaseNumber = (doc: Document): void => {
-  const caseNum = getDisplayedCaseNumber(doc);
+export const copyCaseNumber: HotkeyAction = ({ bodyDocument }): void => {
+  const caseNum = getDisplayedCaseNumber(bodyDocument);
   if (caseNum) {
-    copyString(doc, caseNum);
+    copyString(bodyDocument, caseNum);
     return;
   }
-  const lexID = getDisplayedLexID(doc);
-  copyString(doc, `事件番号なし。LEX/DB ${lexID}`);
+  const lexID = getDisplayedLexID(bodyDocument);
+  copyString(bodyDocument, `事件番号なし。LEX/DB ${lexID}`);
 };
 
-export const copyReference = (doc: Document): void => {
-  const lexID = getDisplayedLexID(doc);
-  if (lexID) copyString(doc, `LEX/DB ${lexID}`);
+export const copyReference: HotkeyAction = ({ bodyDocument }): void => {
+  const lexID = getDisplayedLexID(bodyDocument);
+  if (lexID) copyString(bodyDocument, `LEX/DB ${lexID}`);
 };
 
-export const copyReferenceTsv = (doc: Document): void => {
-  const lexID = getDisplayedLexID(doc);
-  const caseNum = getDisplayedCaseNumber(doc);
-  if (lexID) copyString(doc, `LEX/DB\t${lexID}\t${caseNum}`);
+export const copyReferenceTsv: HotkeyAction = ({ bodyDocument }): void => {
+  const lexID = getDisplayedLexID(bodyDocument);
+  const caseNum = getDisplayedCaseNumber(bodyDocument);
+  if (lexID) copyString(bodyDocument, `LEX/DB\t${lexID}\t${caseNum}`);
 };
 
-export const copyReferenceId = (doc: Document): void => {
-  const lexID = getDisplayedLexID(doc);
-  if (lexID) copyString(doc, lexID);
+export const copyReferenceId: HotkeyAction = ({ bodyDocument }): void => {
+  const lexID = getDisplayedLexID(bodyDocument);
+  if (lexID) copyString(bodyDocument, lexID);
 };
 
-export const copyFullReference = (doc: Document): void => {
-  const lexID = getDisplayedLexID(doc);
-  if (lexID) copyString(doc, `LEX/DB ${lexID}`); // TODO: 裁判所名と日付も入れる
+export const copyFullReference: HotkeyAction = ({ bodyDocument }): void => {
+  const lexID = getDisplayedLexID(bodyDocument);
+  if (lexID) copyString(bodyDocument, `LEX/DB ${lexID}`); // TODO: 裁判所名と日付も入れる
 };
 
-export const gotoZenbun = (doc: Document): void => {
-  const l = doc.getElementById("ShowZenbunHyperLink");
+export const gotoZenbun: HotkeyAction = ({ headDocument }): void => {
+  const l = headDocument.getElementById("ShowZenbunHyperLink");
   if (l) l.click();
 };
 
-export const gotoSearchResults = (doc: Document): void => {
-  const l = doc.getElementById("ResultHyperLink");
+export const gotoSearchResults: HotkeyAction = ({ headDocument }): void => {
+  const l = headDocument.getElementById("ResultHyperLink");
   if (l) l.click();
 };

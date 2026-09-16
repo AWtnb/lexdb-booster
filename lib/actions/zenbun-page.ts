@@ -1,4 +1,6 @@
-export const gotoSyoshi = (url: URL): void => {
+import type { HotkeyAction } from "../types";
+
+export const gotoSyoshi: HotkeyAction = ({ url }): void => {
   if (url.pathname === "/lexbin/LinkZenbun.aspx") {
     url.pathname = "/lexbin/LinkSyoshi.aspx";
   } else {
