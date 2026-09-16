@@ -1,4 +1,10 @@
-import type { HotkeyAction, HotkeyContext } from "../types";
+import type {
+  ActionId,
+  HotkeyAction,
+  HotkeyContext,
+  OpenResultId,
+} from "../types";
+import type { ActionEntry } from "./registry";
 
 export const getSyoshiAnchors = (doc: Document): Element[] =>
   Array.from(doc.querySelectorAll("tr > td[rowspan='3'] a"));
@@ -22,7 +28,22 @@ export const openTopResult: HotkeyAction = (ctx): void => {
 };
 
 /** 検索結果のN番目(0始まり)を開く処理 */
-export const makeOpenResultAction =
+const makeOpenResultAction =
   (index: number): HotkeyAction =>
   (ctx) =>
     openResult(ctx, index);
+
+export const openResultEntries = ([1, 2, 3, 4, 5, 6, 7, 8, 9] as const).reduce<
+  Pick<Record<ActionId, ActionEntry>, OpenResultId>
+>(
+  (acc, n) => {
+    acc[`openResult${n}`] = {
+      label: `検索結果の${n}件目を開く`,
+      scope: "searchResult",
+      needsClipboard: false,
+      run: makeOpenResultAction(n - 1),
+    };
+    return acc;
+  },
+  {} as Pick<Record<ActionId, ActionEntry>, OpenResultId>,
+);
