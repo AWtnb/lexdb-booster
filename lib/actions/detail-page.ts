@@ -1,4 +1,5 @@
 import { toHalfWidth } from "../text-utils";
+import { copyString } from "../ui";
 
 /**
  * 事件番号取得処理
@@ -44,4 +45,45 @@ export const getDisplayedLexID = (doc: Document): string => {
     }
   }
   return "";
+};
+
+export const copyCaseNumber = (doc: Document): void => {
+  const caseNum = getDisplayedCaseNumber(doc);
+  if (caseNum) {
+    copyString(doc, caseNum);
+    return;
+  }
+  const lexID = getDisplayedLexID(doc);
+  copyString(doc, `事件番号なし。LEX/DB ${lexID}`);
+};
+
+export const copyReference = (doc: Document): void => {
+  const lexID = getDisplayedLexID(doc);
+  if (lexID) copyString(doc, `LEX/DB ${lexID}`);
+};
+
+export const copyReferenceTsv = (doc: Document): void => {
+  const lexID = getDisplayedLexID(doc);
+  const caseNum = getDisplayedCaseNumber(doc);
+  if (lexID) copyString(doc, `LEX/DB\t${lexID}\t${caseNum}`);
+};
+
+export const copyReferenceId = (doc: Document): void => {
+  const lexID = getDisplayedLexID(doc);
+  if (lexID) copyString(doc, lexID);
+};
+
+export const copyFullReference = (doc: Document): void => {
+  const lexID = getDisplayedLexID(doc);
+  if (lexID) copyString(doc, `LEX/DB ${lexID}`); // TODO: 裁判所名と日付も入れる
+};
+
+export const gotoZenbun = (doc: Document): void => {
+  const l = doc.getElementById("ShowZenbunHyperLink");
+  if (l) l.click();
+};
+
+export const gotoSearchResults = (doc: Document): void => {
+  const l = doc.getElementById("ResultHyperLink");
+  if (l) l.click();
 };

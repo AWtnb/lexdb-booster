@@ -1,7 +1,3 @@
-import {
-  getDisplayedCaseNumber,
-  getDisplayedLexID as getDisplayedReferenceId,
-} from "./detail-page";
 import { makeOpenResultAction, openTopResult } from "./result-page";
 import {
   clearAllInputBox,
@@ -13,8 +9,17 @@ import {
   pasteSmoothCsv,
   pressSubmitButton,
 } from "./search-page";
-import { copyString } from "../ui";
 import type { ActionId, HotkeyContext, OpenResultId } from "../types";
+import {
+  copyCaseNumber,
+  copyFullReference,
+  copyReference,
+  copyReferenceId,
+  copyReferenceTsv,
+  gotoSearchResults,
+  gotoZenbun,
+} from "./detail-page";
+import { gotoSyoshi } from "./zenbun-page";
 
 /** アクションが有効なページスコープ */
 export type PageScope =
@@ -35,59 +40,6 @@ export type ActionEntry = {
   needsClipboard: boolean;
   /** 実行本体。clipboardTextは needsClipboard が true の時のみ渡される */
   run: (ctx: HotkeyContext, clipboardText: string) => void | Promise<void>;
-};
-
-/**
- * 事件番号コピー処理（detail-page.tsから分離したロジック）
- * 元はhotkey-handler.ts内にインラインで書かれていた
- */
-const copyCaseNumber = (ctx: HotkeyContext): void => {
-  const { bodyDocument } = ctx;
-  const caseNum = getDisplayedCaseNumber(bodyDocument);
-  if (caseNum) {
-    copyString(bodyDocument, caseNum);
-    return;
-  }
-  const refId = getDisplayedReferenceId(bodyDocument);
-  copyString(bodyDocument, `事件番号なし。LEX/DB ${refId}`);
-};
-
-const copyReference = (ctx: HotkeyContext): void => {
-  const refId = getDisplayedReferenceId(ctx.bodyDocument);
-  if (refId) copyString(ctx.bodyDocument, `LEX/DB ${refId}`);
-};
-
-const copyReferenceTsv = (ctx: HotkeyContext): void => {
-  const refId = getDisplayedReferenceId(ctx.bodyDocument);
-  const caseNum = getDisplayedCaseNumber(ctx.bodyDocument);
-  if (refId) copyString(ctx.bodyDocument, `LEX/DB\t${refId}\t${caseNum}`);
-};
-
-const copyReferenceId = (ctx: HotkeyContext): void => {
-  const refId = getDisplayedReferenceId(ctx.bodyDocument);
-  if (refId) copyString(ctx.bodyDocument, refId);
-};
-
-const gotoZenbun = (ctx: HotkeyContext): void => {
-  const l = ctx.headDocument.getElementById("ShowZenbunHyperLink");
-  if (!l) return;
-  l.click();
-};
-
-const gotoSyoshi = (ctx: HotkeyContext): void => {
-  const u = new URL(ctx.url);
-  if (u.pathname === "/lexbin/LinkZenbun.aspx") {
-    u.pathname = "/lexbin/LinkSyoshi.aspx";
-  } else {
-    u.pathname = "/lexbin/ShowSyoshi.aspx";
-  }
-  window.location.href = u.toString();
-};
-
-const gotoSearchResults = (ctx: HotkeyContext): void => {
-  const l = ctx.headDocument.getElementById("ResultHyperLink");
-  if (!l) return;
-  l.click();
 };
 
 const goHome = (): void => {
@@ -171,7 +123,7 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     run: (ctx) => cycleFreeWord(ctx),
   },
   pasteSmoothCsv: {
-    label: "SmoothCSVを貼り付けて検索",
+    label: "SmoothCSVから貼り付けて検索",
     scope: "search",
     needsClipboard: true,
     run: (ctx, cb) => {
@@ -184,43 +136,49 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     label: "事件番号をコピー",
     scope: "detail",
     needsClipboard: false,
-    run: (ctx) => copyCaseNumber(ctx),
+    run: (ctx) => copyCaseNumber(ctx.bodyDocument),
   },
   copyReference: {
     label: "「LEX/DB ●●」形式で出典コピー",
     scope: "detail",
     needsClipboard: false,
-    run: (ctx) => copyReference(ctx),
+    run: (ctx) => copyReference(ctx.bodyDocument),
   },
   copyReferenceTsv: {
     label: "「LEX/DB」と文献番号と事件番号をタブ区切りでコピー",
     scope: "detail",
     needsClipboard: false,
-    run: (ctx) => copyReferenceTsv(ctx),
+    run: (ctx) => copyReferenceTsv(ctx.bodyDocument),
   },
   copyReferenceId: {
     label: "文献番号をコピー",
     scope: "detail",
     needsClipboard: false,
-    run: (ctx) => copyReferenceId(ctx),
+    run: (ctx) => copyReferenceId(ctx.bodyDocument),
+  },
+  copyFullReference: {
+    label: "判例としてコピー",
+    scope: "detail",
+    needsClipboard: false,
+    run: (ctx) => copyFullReference(ctx.bodyDocument),
   },
   gotoZenbun: {
     label: "全文ページへ移動",
     scope: "detail",
     needsClipboard: false,
-    run: (ctx) => gotoZenbun(ctx),
+    run: (ctx) => gotoZenbun(ctx.headDocument),
   },
   gotoSyoshi: {
     label: "書誌ページへ移動",
     scope: "zenbun",
     needsClipboard: false,
-    run: (ctx) => gotoSyoshi(ctx),
+    run: (ctx) => gotoSyoshi(ctx.url),
   },
   gotoSearchResults: {
     label: "検索結果へ移動",
     scope: "detailOrZenbun",
     needsClipboard: false,
-    run: (ctx) => gotoSearchResults(ctx),
+    run: (ctx) => gotoSearchResults(ctx.headDocument),
   },
   openTopResult: {
     label: "検索結果の先頭を開く",

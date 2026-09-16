@@ -32,7 +32,6 @@ export type OpenResultId = `openResult${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}`;
 
 /**
  * アクションを識別するID
- * optionページの保存データやキーバインド設定はこのIDを介してやりとりする
  */
 export type ActionId =
   | "submitSearch"
@@ -48,6 +47,7 @@ export type ActionId =
   | "copyReference"
   | "copyReferenceTsv"
   | "copyReferenceId"
+  | "copyFullReference"
   | "gotoZenbun"
   | "gotoSyoshi"
   | "gotoSearchResults"
