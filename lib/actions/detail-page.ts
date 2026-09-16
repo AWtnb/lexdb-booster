@@ -5,7 +5,7 @@ import { copyString } from "../ui";
 /**
  * 事件番号取得処理
  */
-export const getDisplayedCaseNumber = (doc: Document): string => {
+const getDisplayedCaseNumber = (doc: Document): string => {
   const caseNumbers: string[] = [];
   const trs = Array.from(doc.querySelectorAll<HTMLElement>("tbody tr"));
   let collecting = false;
@@ -34,7 +34,7 @@ export const getDisplayedCaseNumber = (doc: Document): string => {
 /**
  * 文献番号取得処理
  */
-export const getDisplayedLexID = (doc: Document): string => {
+const getDisplayedLexID = (doc: Document): string => {
   const rows = Array.from(
     doc.querySelectorAll<HTMLElement>(".ContentsShow tbody tr"),
   );
