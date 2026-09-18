@@ -114,3 +114,59 @@ export const expandCourtAbbrev = (s: string): string => {
 
   return "";
 };
+
+/**
+ * 裁判所の完全表記を略称に変換する（例: "東京地方裁判所" → "東京地"）
+ */
+export const abbreviateCourtName = (s: string): string => {
+  console.log(s);
+  // 最高裁判所の場合
+  if (s.startsWith("最高裁判所")) {
+    if (s === "最高裁判所第一小法廷") return "最一小";
+    if (s === "最高裁判所第二小法廷") return "最二小";
+    if (s === "最高裁判所第三小法廷") return "最三小";
+    if (s === "最高裁判所大法廷") return "最大";
+    return "最";
+  }
+
+  // 知的財産高等裁判所の場合
+  if (s === "知的財産高等裁判所") return "知財高";
+
+  // 支部の場合（"〇〇裁判所△△支部" 形式）
+  if (s.endsWith("支部")) {
+    const base = s.slice(0, -2); // "支部" を除去
+
+    for (const name of HIGH_COURTS) {
+      const full = `${name}高等裁判所`;
+      if (!base.startsWith(full)) continue;
+      return `${name}高${base.slice(full.length)}支`;
+    }
+    for (const name of DISTRICT_COURTS) {
+      const full = `${name}地方裁判所`;
+      if (!base.startsWith(full)) continue;
+      return `${name}地${base.slice(full.length)}支`;
+    }
+    for (const name of DISTRICT_COURTS) {
+      const full = `${name}家庭裁判所`;
+      if (!base.startsWith(full)) continue;
+      return `${name}家${base.slice(full.length)}支`;
+    }
+  }
+
+  // 高等裁判所の場合
+  for (const name of HIGH_COURTS) {
+    if (s === `${name}高等裁判所`) return `${name}高`;
+  }
+
+  // 地方裁判所の場合
+  for (const name of DISTRICT_COURTS) {
+    if (s === `${name}地方裁判所`) return `${name}地`;
+  }
+
+  // 家庭裁判所の場合（元コードに含まれていないが展開側で扱っているため）
+  for (const name of DISTRICT_COURTS) {
+    if (s === `${name}家庭裁判所`) return `${name}家`;
+  }
+
+  return "";
+};

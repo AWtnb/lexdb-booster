@@ -30,7 +30,7 @@ export const DEFAULT_KEY_BINDINGS: KeyBinding[] = [
 
   // 詳細ページ
   { key: "KeyC", actionId: "copyCaseNumber" },
-  { key: "S-KeyC", actionId: "copyFullReference" },
+  { key: "KeyQ", actionId: "copyFullReference" },
   { key: "KeyI", actionId: "copyReference" },
   { key: "C-KeyI", actionId: "copyReferenceId" },
   { key: "S-KeyI", actionId: "copyReferenceTsv" },
