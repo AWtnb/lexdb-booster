@@ -85,8 +85,8 @@ const getCourtDesicion = (doc: Document): string => {
 const getTimestamp = (doc: Document): string => {
   const timestamp = toHalfWidth(getRowValue(doc, "【裁判年月日】"))
     .replace(/\s/g, "")
-    .replace("年", ".")
-    .replace("月", ".")
+    .replace("年", "・")
+    .replace("月", "・")
     .replace("日", "");
   return `${timestamp.substring(0, 1)}${timestamp.substring(2)}`;
 };
