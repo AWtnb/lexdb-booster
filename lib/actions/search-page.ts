@@ -1,12 +1,9 @@
 import { expandCourtAbbrev } from "../court";
-import { FREEWORD_IDS, setFreeWords } from "../free-words";
 import {
-  getYearCode,
   toFullWidthDigits,
   parseDateString,
   toHalfWidth,
   parseCaseNumber,
-  trimUncertainPrefix,
 } from "../text-utils";
 import { setSelectBoxValue } from "../ui";
 import type { HotkeyAction, HotkeyActionWithClipboardText } from "../types";
@@ -80,21 +77,25 @@ export const pasteDate: HotkeyActionWithClipboardText = (
   fillDateFields(bodyDocument, cb);
 };
 
+const FREEWORD_IDS = [
+  "InputFreeKeyword_Control_KEYWORD00",
+  "InputFreeKeyword_Control_KEYWORD05",
+  "InputFreeKeyword_Control_KEYWORD10",
+  "InputFreeKeyword_Control_KEYWORD15",
+  "InputFreeKeyword_Control_KEYWORD20",
+];
+
 /**
  * フリーワードの最後の入力済み欄にフォーカスする
  */
 export const focusFreeWord: HotkeyAction = ({ bodyDocument }): void => {
-  const blankElemIds = FREEWORD_IDS.filter((id) => {
+  const filledInputIds = FREEWORD_IDS.filter((id) => {
     const elem = bodyDocument.getElementById(id) as HTMLInputElement;
     return elem.value !== "";
   });
 
-  if (blankElemIds.length < 1) return;
-
-  const lastId = blankElemIds.pop();
-  if (lastId) {
-    (bodyDocument.getElementById(lastId) as HTMLInputElement).select();
-  }
+  const target = filledInputIds.pop() ?? FREEWORD_IDS[0]!;
+  (bodyDocument.getElementById(target) as HTMLInputElement).select();
 };
 
 /**
@@ -179,6 +180,29 @@ const fillDateFields = (doc: Document, date: string): void => {
   });
 };
 
+/** 出典の詳細欄を整形する */
+const formatDetail = (detail: string): string => {
+  let fmt = detail;
+
+  // 文字列から最初の連続数字以降を抽出
+  const m = fmt.match(/[0-9]+/);
+  if (m) fmt = fmt.slice(m.index);
+
+  // 「高刑速報（昭58）号145頁」のようなとき、括弧だけ全角にする
+  const regDate = /\(([明大昭平令][0-9]{1,2})\)/;
+  fmt = fmt.replace(regDate, (_, y) => `（${y}）`);
+
+  // 「=」以前を除去する（合併号対策）
+  const last = fmt.split("=").pop();
+  if (last) fmt = last;
+
+  // 2番目以降の場合は頁部分を除去する
+  const regSecondPage = /[0-9]+頁[②㋺ロ](事件)?/;
+  fmt = fmt.replace(regSecondPage, "");
+
+  return toFullWidthDigits(fmt);
+};
+
 const SMOOTH_CSV_COL = {
   COURT: 4,
   DATE: 6,
@@ -196,15 +220,11 @@ export const pasteSmoothCsv: HotkeyActionWithClipboardText = (
 ): void => {
   const { bodyDocument } = ctx;
   const line = toHalfWidth(cb);
-  const fields = line
-    .split("\t")
-    .map((t) => (t.startsWith("?") ? "" : t))
-    .map((s) => s.split("=").slice(-1)[0]);
-
-  const court = fields[SMOOTH_CSV_COL["COURT"]]!;
-  const date = fields[SMOOTH_CSV_COL["DATE"]]!;
-  const detail = fields[SMOOTH_CSV_COL["DETAIL"]]!;
-  const casenumber = fields[SMOOTH_CSV_COL["CASE_NUMBER"]]!;
+  const fields = line.split("\t").map((t) => (t.startsWith("?") ? "" : t));
+  const court = fields[SMOOTH_CSV_COL.COURT]!;
+  const date = fields[SMOOTH_CSV_COL.DATE]!;
+  const detail = fields[SMOOTH_CSV_COL.DETAIL]!;
+  const casenumber = fields[SMOOTH_CSV_COL.CASE_NUMBER]!;
 
   const lexIdMatch = detail.match(/\d{8}$/);
   if (lexIdMatch) {
@@ -219,13 +239,15 @@ export const pasteSmoothCsv: HotkeyActionWithClipboardText = (
     pasteCaseNumber(ctx, caseNumberMatch[0]);
   }
 
-  try {
-    fillDateFields(bodyDocument, date);
-  } catch (error) {
-    console.error("SmoothCSV貼り付けエラー:", error);
-  }
+  fillDateFields(bodyDocument, date);
 
+  const freewords = [formatDetail(detail)];
   const courtExpanded = expandCourtAbbrev(court);
-  const fullwidthDetail = toFullWidthDigits(detail);
-  setFreeWords(bodyDocument, courtExpanded, [fullwidthDetail]);
+  if (courtExpanded) freewords.push(courtExpanded);
+
+  for (const id of FREEWORD_IDS) {
+    const elem = bodyDocument.getElementById(id) as HTMLInputElement;
+    const v = freewords.pop();
+    elem.value = v ?? "";
+  }
 };

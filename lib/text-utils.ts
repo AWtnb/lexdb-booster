@@ -56,22 +56,6 @@ export const parseDateString = (
 };
 
 /**
- * 文字列から最初の連続数字以降を抽出
- */
-export const getReferenceDetail = (str: string): string => {
-  const m = str.match(/[0-9０-９]+/);
-  if (!m) return str;
-  return str.slice(m.index);
-};
-
-/**
- * 文字列の先頭にある不確定記号（`?`や`>`）を削除する
- */
-export const trimUncertainPrefix = (s: string): string => {
-  return s.replace(/^[?>]+/, "");
-};
-
-/**
  * 文字列（の先頭）の事件番号をパースする
  * 例：
  *    平成２０年（行コ）第３１号→{ code: "4", year: 20, sign: "行コ", num: 31 }
@@ -80,12 +64,13 @@ export const parseCaseNumber = (
   str: string,
 ): { code: string; year: number; sign: string; num: number } | null => {
   const [top] = toHalfWidth(str)
+    .replaceAll("?", "")
     .replace("元年", "1年")
     .replace(/^\(/, "")
     .replace(/\)$/, "")
     .split("、");
   if (!top) return null;
-  const [fullYear, sign, fullNum] = trimUncertainPrefix(top)
+  const [fullYear, sign, fullNum] = top
     .replace(/号.+$/, "号")
     .replace(/[\(\)]/g, "_")
     .split("_");
