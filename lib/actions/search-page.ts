@@ -54,7 +54,7 @@ const fillCaseNumber = (doc: Document, s: string): boolean => {
   const reg = new RegExp(
     "(明治|大正|昭和|平成|令和)([0-9]{1,2}|元)年\(.{1,3}\)第[0-9]+号",
   );
-  const m = reg.exec(s);
+  const m = reg.exec(toHalfWidth(s));
   if (!m) return false;
   const top = s.slice(m.index);
   const caseNumber = parseCaseNumber(top);
@@ -178,7 +178,7 @@ export const pasteLexId: HotkeyActionWithClipboardText = (
  * 日付欄への入力を共通化（指定モードに切り替えてから値をセット）
  */
 const fillDateFields = (doc: Document, date: string): boolean => {
-  const { code, y, m, d } = parseDateString(date);
+  const { code, y, m, d } = parseDateString(toHalfWidth(date));
   if ([code, y, m, d].some((value) => value === "")) return false;
 
   (
@@ -259,7 +259,7 @@ export const pasteSmoothCsv: HotkeyActionWithClipboardText = (
     return true;
   }
 
-  if (pasteCaseNumber(ctx, casenumber)) {
+  if (fillCaseNumber(bodyDocument, casenumber)) {
     return true;
   }
 
