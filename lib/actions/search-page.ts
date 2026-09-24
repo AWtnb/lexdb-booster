@@ -8,6 +8,10 @@ import {
 import { setSelectBoxValue } from "../ui";
 import type { HotkeyAction, HotkeyActionWithClipboardText } from "../types";
 
+const normalize = (s: string): string => {
+  return toHalfWidth(s).replace(/^\?/, "");
+};
+
 /**
  * 入力フィールドをすべてクリアする
  */
@@ -52,9 +56,9 @@ export const pressSubmitButton: HotkeyAction = ({
  */
 const fillCaseNumber = (doc: Document, s: string): boolean => {
   const reg = new RegExp(
-    "(明治|大正|昭和|平成|令和)([0-9]{1,2}|元)年\(.{1,3}\)第[0-9]+号",
+    "(明治|大正|昭和|平成|令和)([0-9]{1,2}|元)年\\(.{1,3}\\)第[0-9]+号",
   );
-  const m = reg.exec(toHalfWidth(s));
+  const m = reg.exec(normalize(s));
   if (!m) return false;
   const top = s.slice(m.index);
   const caseNumber = parseCaseNumber(top);
@@ -155,7 +159,7 @@ export const cycleFreeWord: HotkeyAction = ({ bodyDocument }): boolean => {
  * LEX文献番号欄を埋める処理
  */
 const fillLexId = (doc: Document, s: string): boolean => {
-  const m = toHalfWidth(s).match(/\d{8}/);
+  const m = normalize(s).match(/\d{8}/);
   if (!m) return false;
   const lexId = m[0];
   (
@@ -178,7 +182,7 @@ export const pasteLexId: HotkeyActionWithClipboardText = (
  * 日付欄への入力を共通化（指定モードに切り替えてから値をセット）
  */
 const fillDateFields = (doc: Document, date: string): boolean => {
-  const { code, y, m, d } = parseDateString(toHalfWidth(date));
+  const { code, y, m, d } = parseDateString(normalize(date));
   if ([code, y, m, d].some((value) => value === "")) return false;
 
   (
