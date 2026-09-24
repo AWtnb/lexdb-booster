@@ -3,10 +3,10 @@ const FONT_NAME = "LexDBNotoSansJP";
 const getFontUrl = (): string => document.documentElement.dataset.fontUrl ?? "";
 
 const injectFontFace = (doc: Document): void => {
-  if (doc.getElementById("better-lexdb-font")) return;
+  if (doc.getElementById("lexdb-booster-font")) return;
   const style = doc.createElement("style");
 
-  style.id = "better-lexdb-font";
+  style.id = "lexdb-booster-font";
   style.textContent = `
 @font-face {
   font-family: "${FONT_NAME}";

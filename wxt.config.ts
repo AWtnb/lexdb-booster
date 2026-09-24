@@ -2,7 +2,7 @@ import { defineConfig } from "wxt";
 
 export default defineConfig({
   manifest: {
-    name: "better-lexdb",
+    name: "lexdb-booster",
     description: "LEX/DBをもっと使いやすく",
     permissions: ["clipboardRead", "clipboardWrite"],
     host_permissions: [
