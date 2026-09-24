@@ -91,47 +91,74 @@ const getTimestamp = (doc: Document): string => {
   return `${timestamp.substring(0, 1)}${timestamp.substring(2)}`;
 };
 
-export const copyCaseNumber: HotkeyAction = ({ bodyDocument }): void => {
+export const copyCaseNumber: HotkeyAction = ({ bodyDocument }): boolean => {
   const caseNum = getDisplayedCaseNumber(bodyDocument);
   if (caseNum) {
     copyString(bodyDocument, caseNum);
-    return;
+    return true;
   }
   const lexID = getDisplayedLexID(bodyDocument);
-  copyString(bodyDocument, `事件番号なし。LEX/DB ${lexID}`);
+  if (lexID) {
+    copyString(bodyDocument, `事件番号なし。LEX/DB ${lexID}`);
+    return true;
+  }
+  return false;
 };
 
-export const copyReference: HotkeyAction = ({ bodyDocument }): void => {
+export const copyReference: HotkeyAction = ({ bodyDocument }): boolean => {
   const lexID = getDisplayedLexID(bodyDocument);
-  if (lexID) copyString(bodyDocument, `LEX/DB ${lexID}`);
+  if (lexID) {
+    copyString(bodyDocument, `LEX/DB ${lexID}`);
+    return true;
+  }
+  return false;
 };
 
-export const copyReferenceTsv: HotkeyAction = ({ bodyDocument }): void => {
+export const copyReferenceTsv: HotkeyAction = ({ bodyDocument }): boolean => {
   const lexID = getDisplayedLexID(bodyDocument);
   const caseNum = getDisplayedCaseNumber(bodyDocument);
-  if (lexID) copyString(bodyDocument, `LEX/DB\t${lexID}\t${caseNum}`);
+  if (lexID) {
+    copyString(bodyDocument, `LEX/DB\t${lexID}\t${caseNum}`);
+    return true;
+  }
+  return false;
 };
 
-export const copyReferenceId: HotkeyAction = ({ bodyDocument }): void => {
+export const copyReferenceId: HotkeyAction = ({ bodyDocument }): boolean => {
   const lexID = getDisplayedLexID(bodyDocument);
-  if (lexID) copyString(bodyDocument, lexID);
+  if (lexID) {
+    copyString(bodyDocument, lexID);
+    return true;
+  }
+  return false;
 };
 
-export const copyFullReference: HotkeyAction = ({ bodyDocument }): void => {
+export const copyFullReference: HotkeyAction = ({ bodyDocument }): boolean => {
   const lexID = getDisplayedLexID(bodyDocument);
-  if (lexID)
+  if (lexID) {
     copyString(
       bodyDocument,
       `${getCourtDesicion(bodyDocument)}${getTimestamp(bodyDocument)}LEX/DB${lexID}`,
     );
+    return true;
+  }
+  return false;
 };
 
-export const gotoZenbun: HotkeyAction = ({ headDocument }): void => {
+export const gotoZenbun: HotkeyAction = ({ headDocument }): boolean => {
   const l = headDocument.getElementById("ShowZenbunHyperLink");
-  if (l) l.click();
+  if (l) {
+    l.click();
+    return true;
+  }
+  return false;
 };
 
-export const gotoSearchResults: HotkeyAction = ({ headDocument }): void => {
+export const gotoSearchResults: HotkeyAction = ({ headDocument }): boolean => {
   const l = headDocument.getElementById("ResultHyperLink");
-  if (l) l.click();
+  if (l) {
+    l.click();
+    return true;
+  }
+  return false;
 };

@@ -9,22 +9,23 @@ import type { ActionEntry } from "./registry";
 export const getSyoshiAnchors = (doc: Document): Element[] =>
   Array.from(doc.querySelectorAll("tr > td[rowspan='3'] a"));
 
-const openResult = (ctx: HotkeyContext, index: number): void => {
+const openResult = (ctx: HotkeyContext, index: number): boolean => {
   const anchors = getSyoshiAnchors(ctx.bodyDocument);
-  if (!anchors) return;
+  if (!anchors) return false;
   const target = anchors[index * 2];
   const js = target?.getAttribute("href");
-  if (!js) return;
+  if (!js) return false;
 
   const num = js.substring(37, 45);
   ctx.bodyWindow.ShowBunken?.("ShowSyoshi", num);
+  return true;
 };
 
 /**
  * 検索結果の先頭行を開く処理
  */
-export const openTopResult: HotkeyAction = (ctx): void => {
-  openResult(ctx, 0);
+export const openTopResult: HotkeyAction = (ctx): boolean => {
+  return openResult(ctx, 0);
 };
 
 /** 検索結果のN番目(0始まり)を開く処理 */

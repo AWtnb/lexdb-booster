@@ -11,7 +11,7 @@ import type { HotkeyAction, HotkeyActionWithClipboardText } from "../types";
 /**
  * 入力フィールドをすべてクリアする
  */
-export const clearAllInputBox: HotkeyAction = ({ bodyDocument }): void => {
+export const clearAllInputBox: HotkeyAction = ({ bodyDocument }): boolean => {
   (
     bodyDocument.getElementById(
       "InputHanketuYMD_Control_HanketuSubeteRadioButton",
@@ -30,30 +30,39 @@ export const clearAllInputBox: HotkeyAction = ({ bodyDocument }): void => {
       elem.checked = false;
     }
   });
+  return true;
 };
 
 /**
  * 「検索開始」ボタンを押す
  */
-export const pressSubmitButton: HotkeyAction = ({ headWindow, url }) => {
+export const pressSubmitButton: HotkeyAction = ({
+  headWindow,
+  url,
+}): boolean => {
   if (url.pathname.endsWith("SearchAll.aspx")) {
     headWindow.SubmitSearchBottom?.("search", "_parent");
+    return true;
   }
+  return false;
 };
 
 /**
- * 事件番号貼り付け処理
+ * 事件番号欄を埋める
  */
-export const pasteCaseNumber: HotkeyActionWithClipboardText = (
-  { bodyDocument },
-  cb: string,
-): void => {
-  const caseNumber = parseCaseNumber(cb);
-  if (!caseNumber) return;
+const fillCaseNumber = (doc: Document, s: string): boolean => {
+  const reg = new RegExp(
+    "(明治|大正|昭和|平成|令和)([0-9]{1,2}|元)年\(.{1,3}\)第[0-9]+号",
+  );
+  const m = reg.exec(s);
+  if (!m) return false;
+  const top = s.slice(m.index);
+  const caseNumber = parseCaseNumber(top);
+  if (!caseNumber) return false;
   const { code, year, sign, num } = caseNumber;
 
   setSelectBoxValue(
-    bodyDocument,
+    doc,
     "InputJikenBangou_Control_JikenBangou_DropDownList",
     code,
   );
@@ -63,8 +72,19 @@ export const pasteCaseNumber: HotkeyActionWithClipboardText = (
     { id: "InputJikenBangou_Control_JikenBangouText1", value: sign },
     { id: "InputJikenBangou_Control_JikenBangouText2", value: num.toString() },
   ].forEach(({ id, value }) => {
-    (bodyDocument.getElementById(id) as HTMLInputElement).value = value;
+    (doc.getElementById(id) as HTMLInputElement).value = value;
   });
+  return true;
+};
+
+/**
+ * 事件番号貼り付け処理
+ */
+export const pasteCaseNumber: HotkeyActionWithClipboardText = (
+  { bodyDocument },
+  cb: string,
+): boolean => {
+  return fillCaseNumber(bodyDocument, cb);
 };
 
 /**
@@ -73,8 +93,8 @@ export const pasteCaseNumber: HotkeyActionWithClipboardText = (
 export const pasteDate: HotkeyActionWithClipboardText = (
   { bodyDocument },
   cb,
-): void => {
-  fillDateFields(bodyDocument, cb);
+): boolean => {
+  return fillDateFields(bodyDocument, cb);
 };
 
 const FREEWORD_IDS = [
@@ -88,7 +108,7 @@ const FREEWORD_IDS = [
 /**
  * フリーワードの最後の入力済み欄にフォーカスする
  */
-export const focusFreeWord: HotkeyAction = ({ bodyDocument }): void => {
+export const focusFreeWord: HotkeyAction = ({ bodyDocument }): boolean => {
   const filledInputIds = FREEWORD_IDS.filter((id) => {
     const elem = bodyDocument.getElementById(id) as HTMLInputElement;
     return elem.value !== "";
@@ -96,26 +116,27 @@ export const focusFreeWord: HotkeyAction = ({ bodyDocument }): void => {
 
   const target = filledInputIds.pop() ?? FREEWORD_IDS[0]!;
   (bodyDocument.getElementById(target) as HTMLInputElement).select();
+  return true;
 };
 
 /**
  * フリーワードのAND欄へのフォーカスをサイクルする
  */
-export const cycleFreeWord: HotkeyAction = ({ bodyDocument }): void => {
+export const cycleFreeWord: HotkeyAction = ({ bodyDocument }): boolean => {
   const activeElem = bodyDocument.activeElement;
-  if (!activeElem) return;
+  if (!activeElem) return false;
 
   const idx = FREEWORD_IDS.indexOf(activeElem.id);
   if (0 <= idx) {
     const nextIdx = (idx + 1) % FREEWORD_IDS.length;
     bodyDocument.getElementById(FREEWORD_IDS[nextIdx]!)?.focus();
-    return;
+    return true;
   }
 
   const activeId = activeElem.id;
   if (!activeId.startsWith("InputFreeKeyword_Control_KEYWORD")) {
     bodyDocument.getElementById(FREEWORD_IDS[0]!)?.focus();
-    return;
+    return true;
   }
 
   const current = parseInt(
@@ -127,12 +148,20 @@ export const cycleFreeWord: HotkeyAction = ({ bodyDocument }): void => {
   const rowIdx = Math.floor(current / 5);
   const nextRowIdx = (rowIdx + 1) % FREEWORD_IDS.length;
   bodyDocument.getElementById(FREEWORD_IDS[nextRowIdx]!)?.focus();
+  return true;
 };
 
-const setLexId = (doc: Document, lexId: string): void => {
+/**
+ * LEX文献番号欄を埋める処理
+ */
+const fillLexId = (doc: Document, s: string): boolean => {
+  const m = toHalfWidth(s).match(/\d{8}/);
+  if (!m) return false;
+  const lexId = m[0];
   (
     doc.getElementById("InputBunban_Control_BUNKEN00") as HTMLInputElement
   ).value = lexId;
+  return true;
 };
 
 /**
@@ -141,19 +170,17 @@ const setLexId = (doc: Document, lexId: string): void => {
 export const pasteLexId: HotkeyActionWithClipboardText = (
   { bodyDocument },
   cb,
-): void => {
-  const lexIdMatch = toHalfWidth(cb).match(/\d{8}$/);
-  if (lexIdMatch) {
-    setLexId(bodyDocument, lexIdMatch[0]);
-  }
+): boolean => {
+  return fillLexId(bodyDocument, cb);
 };
 
 /**
  * 日付欄への入力を共通化（指定モードに切り替えてから値をセット）
  */
-const fillDateFields = (doc: Document, date: string): void => {
+const fillDateFields = (doc: Document, date: string): boolean => {
   const { code, y, m, d } = parseDateString(date);
-  console.log(code, y, m, d);
+  if ([code, y, m, d].some((value) => value === "")) return false;
+
   (
     doc.getElementById(
       "InputHanketuYMD_Control_HanketuShiteiRadioButton",
@@ -178,6 +205,8 @@ const fillDateFields = (doc: Document, date: string): void => {
   ].forEach(({ id, value }) => {
     (doc.getElementById(id) as HTMLInputElement).value = value;
   });
+
+  return true;
 };
 
 /** 出典の詳細欄を整形する */
@@ -217,7 +246,7 @@ const SMOOTH_CSV_COL = {
 export const pasteSmoothCsv: HotkeyActionWithClipboardText = (
   ctx,
   cb,
-): void => {
+): boolean => {
   const { bodyDocument } = ctx;
   const line = toHalfWidth(cb);
   const fields = line.split("\t").map((t) => (t.startsWith("?") ? "" : t));
@@ -226,20 +255,17 @@ export const pasteSmoothCsv: HotkeyActionWithClipboardText = (
   const detail = fields[SMOOTH_CSV_COL.DETAIL]!;
   const casenumber = fields[SMOOTH_CSV_COL.CASE_NUMBER]!;
 
-  const lexIdMatch = detail.match(/\d{8}$/);
-  if (lexIdMatch) {
-    setLexId(bodyDocument, lexIdMatch[0]);
-    return;
+  if (fillLexId(bodyDocument, detail)) {
+    return true;
   }
 
-  const caseNumberMatch = casenumber.match(
-    /(明治|大正|昭和|平成|令和)([0-9]{1,2}|元)年\(.{1,3}\)第[0-9]+号/,
-  );
-  if (caseNumberMatch) {
-    pasteCaseNumber(ctx, caseNumberMatch[0]);
+  if (pasteCaseNumber(ctx, casenumber)) {
+    return true;
   }
 
-  fillDateFields(bodyDocument, date);
+  if (!fillDateFields(bodyDocument, date)) {
+    return false;
+  }
 
   const freewords = [formatDetail(detail)];
   const courtExpanded = expandCourtAbbrev(court);
@@ -250,4 +276,5 @@ export const pasteSmoothCsv: HotkeyActionWithClipboardText = (
     const v = freewords.pop();
     elem.value = v ?? "";
   }
+  return true;
 };

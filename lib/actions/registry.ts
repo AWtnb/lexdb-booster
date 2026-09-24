@@ -32,18 +32,22 @@ export type PageScope =
 
 /** レジストリ1エントリの定義 */
 export type ActionEntry = {
-  /** オプションページ表示用の日本語ラベル */
+  /** 日本語ラベル */
   label: string;
   /** 有効なページスコープ */
   scope: PageScope;
   /** クリップボード読み取りが必要か */
   needsClipboard: boolean;
-  /** 実行本体。clipboardTextは needsClipboard が true の時のみ渡される */
-  run: (ctx: HotkeyContext, clipboardText: string) => void | Promise<void>;
+  /** 実行本体。成否の真偽値を返す。clipboardTextは needsClipboard が true の時のみ渡されるようにする */
+  run: (
+    ctx: HotkeyContext,
+    clipboardText: string,
+  ) => boolean | Promise<boolean>;
 };
 
-const goHome = (): void => {
+const goHome = (): boolean => {
   window.location.href = "https://lex.lawlibrary.jp/lexbin/SearchAll.aspx";
+  return true;
 };
 
 /**
@@ -75,8 +79,11 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     needsClipboard: true,
     run: (ctx, cb) => {
       clearAllInputBox(ctx);
-      pasteCaseNumber(ctx, cb);
-      pressSubmitButton(ctx);
+      if (pasteCaseNumber(ctx, cb)) {
+        pressSubmitButton(ctx);
+        return true;
+      }
+      return false;
     },
   },
   pasteDate: {
@@ -91,8 +98,11 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     needsClipboard: true,
     run: (ctx, cb) => {
       clearAllInputBox(ctx);
-      pasteLexId(ctx, cb);
-      pressSubmitButton(ctx);
+      if (pasteLexId(ctx, cb)) {
+        pressSubmitButton(ctx);
+        return true;
+      }
+      return false;
     },
   },
   focusFreeWord: {
@@ -113,8 +123,11 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     needsClipboard: true,
     run: (ctx, cb) => {
       clearAllInputBox(ctx);
-      pasteSmoothCsv(ctx, cb);
-      pressSubmitButton(ctx);
+      if (pasteSmoothCsv(ctx, cb)) {
+        pressSubmitButton(ctx);
+        return true;
+      }
+      return false;
     },
   },
   copyCaseNumber: {

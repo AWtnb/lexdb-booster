@@ -22,11 +22,11 @@ export type HotkeyContext = FramePair & {
   isInputableElem: boolean;
 };
 
-export type HotkeyAction = (ctx: HotkeyContext) => void | Promise<void>;
+export type HotkeyAction = (ctx: HotkeyContext) => boolean | Promise<boolean>;
 export type HotkeyActionWithClipboardText = (
   ctx: HotkeyContext,
   clipboardText: string,
-) => void | Promise<void>;
+) => boolean | Promise<boolean>;
 
 export type OpenResultId = `openResult${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}`;
 
