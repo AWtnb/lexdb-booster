@@ -1,12 +1,11 @@
-import { buildKeyString } from "./keystring";
-import { handleHotkey } from "./hotkey-handler";
-import { applyDetailPageStyles, applySearchResultPageStyles } from "../styles";
-import { focusFrameBody } from "../ui";
-import { isDetailPage, isSearchResultPage } from "../page";
-import { toggleHelpOverlay } from "../ui";
-import { getActiveBindings } from "../help";
-import type { FrameWindow } from "../types";
 import { getSyoshiAnchors, openTopResult } from "../actions/result-page";
+import { getActiveBindings } from "../help";
+import { isDetailPage, isSearchResultPage } from "../page";
+import { applyDetailPageStyles, applySearchResultPageStyles } from "../styles";
+import type { FrameWindow } from "../types";
+import { focusFrameBody, toggleHelpOverlay } from "../ui";
+import { handleHotkey } from "./hotkey-handler";
+import { buildKeyString } from "./keystring";
 
 const RETRY_INTERVAL_MS = 3000;
 const MAX_RETRIES = 5;

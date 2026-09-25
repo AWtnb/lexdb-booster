@@ -1,3 +1,13 @@
+import type { ActionId, HotkeyContext } from "../types";
+import {
+  copyCaseNumber,
+  copyFullReference,
+  copyReference,
+  copyReferenceId,
+  copyReferenceTsv,
+  gotoSearchResults,
+  gotoZenbun,
+} from "./detail-page";
 import { openResultEntries, openTopResult } from "./result-page";
 import {
   clearAllInputBox,
@@ -10,16 +20,6 @@ import {
   pasteSmoothCsv,
   pressSubmitButton,
 } from "./search-page";
-import type { ActionId, HotkeyContext, OpenResultId } from "../types";
-import {
-  copyCaseNumber,
-  copyFullReference,
-  copyReference,
-  copyReferenceId,
-  copyReferenceTsv,
-  gotoSearchResults,
-  gotoZenbun,
-} from "./detail-page";
 import { gotoSyoshi } from "./zenbun-page";
 
 /** アクションが有効なページスコープ */

@@ -1,13 +1,13 @@
+import type { PageScope } from "./actions/registry";
 import { ACTION_REGISTRY } from "./actions/registry";
 import { DEFAULT_KEY_BINDINGS } from "./hotkey/keybindings";
+import { formatKeyString } from "./hotkey/keystring";
 import {
   isDetailPage,
-  isSearchResultPage,
   isSearchPage,
+  isSearchResultPage,
   isZenbunPage,
 } from "./page";
-import type { PageScope } from "./actions/registry";
-import { formatKeyString } from "./hotkey/keystring";
 
 /**
  * URL から現在ページが該当するスコープ一覧を返す

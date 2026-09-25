@@ -1,12 +1,12 @@
-import { getCurrentClipboardText } from "../text-utils";
+import type { ActionEntry } from "../actions/registry";
+import { ACTION_REGISTRY } from "../actions/registry";
 import {
   isDetailPage,
-  isSearchResultPage,
   isSearchPage,
+  isSearchResultPage,
   isZenbunPage,
 } from "../page";
-import { ACTION_REGISTRY } from "../actions/registry";
-import type { ActionEntry } from "../actions/registry";
+import { getCurrentClipboardText } from "../text-utils";
 import type { HotkeyContext, KeyBinding } from "../types";
 import { DEFAULT_KEY_BINDINGS } from "./keybindings";
 

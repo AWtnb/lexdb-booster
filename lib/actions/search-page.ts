@@ -1,14 +1,14 @@
 import { deriveLeadingCourtName, expandCourtAbbrev } from "../court";
 import {
+  getYearCode,
+  matchTimestamp,
+  parseCaseNumber,
   toFullWidthDigits,
   toHalfWidth,
-  parseCaseNumber,
-  matchTimestamp,
-  getYearCode,
   type Timestamp,
 } from "../text-utils";
-import { setSelectBoxValue } from "../ui";
 import type { HotkeyAction, HotkeyActionWithClipboardText } from "../types";
+import { setSelectBoxValue } from "../ui";
 
 /**
  * 文字列を正規化する
