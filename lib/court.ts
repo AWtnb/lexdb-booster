@@ -170,3 +170,53 @@ export const abbreviateCourtName = (s: string): string => {
 
   return "";
 };
+
+const lenOrdered = (lines: string[]): string[] =>
+  [...lines].sort((a, b) => b.length - a.length);
+
+const getLeadingCourtBranch = (s: string): string => {
+  const m = /^.+支部?/.exec(s);
+  if (!m) return "";
+  return `${m[0]}部`.replace(/部部$/, "部");
+};
+
+/*
+ * 文字列の先頭から裁判所名を抽出する
+ * 例: "東京地" → "東京地方裁判所"
+ * 例: "東京地裁" → "東京地方裁判所"
+ */
+export const deriveLeadingCourtName = (s: string): string => {
+  const courtConfigs = [
+    {
+      names: HIGH_COURTS,
+      suffix: "高",
+      full: "高等裁判所",
+      abbr: "(等裁判所|裁)?",
+    },
+    {
+      names: DISTRICT_COURTS,
+      suffix: "地",
+      full: "地方裁判所",
+      abbr: "(方裁判所|裁)?",
+    },
+  ];
+
+  for (const { names, suffix, full, abbr } of courtConfigs) {
+    for (const name of lenOrdered(names)) {
+      const m = new RegExp(`^${name}${suffix}${abbr}`).exec(s);
+      if (!m) continue;
+      const branch = getLeadingCourtBranch(s.slice(m[0].length));
+      return `${name}${full}${branch}`;
+    }
+  }
+
+  if (s.startsWith("最")) {
+    if (s.startsWith("最一小")) return "最高裁判所第一小法廷";
+    if (s.startsWith("最二小")) return "最高裁判所第二小法廷";
+    if (s.startsWith("最三小")) return "最高裁判所第三小法廷";
+    if (s.startsWith("最大")) return "最高裁判所大法廷";
+    return "最高裁判所";
+  }
+
+  return "";
+};

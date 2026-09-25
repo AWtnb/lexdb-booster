@@ -18,6 +18,7 @@ export const DEFAULT_KEY_BINDINGS: KeyBinding[] = [
   { key: "KeyF", actionId: "focusFreeWord" },
   { key: "A-KeyN", actionId: "cycleFreeWord" },
   { key: "KeyV", actionId: "pasteSmoothCsv" },
+  { key: "A-KeyV", actionId: "pastePrecedent" },
 
   // 検索結果ページ
   { key: "Enter", actionId: "openTopResult" },

@@ -1,13 +1,19 @@
-import { expandCourtAbbrev } from "../court";
+import { deriveLeadingCourtName, expandCourtAbbrev } from "../court";
 import {
   toFullWidthDigits,
-  parseDateString,
   toHalfWidth,
   parseCaseNumber,
+  matchTimestamp,
+  getYearCode,
+  type Timestamp,
 } from "../text-utils";
 import { setSelectBoxValue } from "../ui";
 import type { HotkeyAction, HotkeyActionWithClipboardText } from "../types";
 
+/**
+ * 文字列を正規化する
+ * （半角カタカナ、不要な文字の削除など）
+ */
 const normalize = (s: string): string => {
   return toHalfWidth(s).replace(/^\?/, "");
 };
@@ -92,13 +98,53 @@ export const pasteCaseNumber: HotkeyActionWithClipboardText = (
 };
 
 /**
+ * 日付欄へ入力する。
+ * 入力成功した場合、Timestamp オブジェクトを返す。
+ */
+const fillDateFields = (doc: Document, s: string): Timestamp | null => {
+  const timestamp = matchTimestamp(normalize(s));
+  if (!timestamp) return null;
+
+  (
+    doc.getElementById(
+      "InputHanketuYMD_Control_HanketuShiteiRadioButton",
+    ) as HTMLInputElement
+  ).checked = true;
+
+  setSelectBoxValue(
+    doc,
+    "InputHanketuYMD_Control_NENGOU_DropDownList0",
+    getYearCode(timestamp.date.label),
+  );
+
+  [
+    {
+      id: "InputHanketuYMD_Control_HANKETU_YEAR0",
+      value: timestamp.date.year,
+    },
+    {
+      id: "InputHanketuYMD_Control_HANKETU_MONTH0",
+      value: timestamp.date.month,
+    },
+    {
+      id: "InputHanketuYMD_Control_HANKETU_DAY0",
+      value: timestamp.date.day,
+    },
+  ].forEach(({ id, value }) => {
+    (doc.getElementById(id) as HTMLInputElement).value = String(value);
+  });
+
+  return timestamp;
+};
+
+/**
  * 日付貼り付け処理
  */
 export const pasteDate: HotkeyActionWithClipboardText = (
   { bodyDocument },
   cb,
 ): boolean => {
-  return fillDateFields(bodyDocument, cb);
+  return fillDateFields(bodyDocument, cb) !== null;
 };
 
 const FREEWORD_IDS = [
@@ -178,48 +224,14 @@ export const pasteLexId: HotkeyActionWithClipboardText = (
   return fillLexId(bodyDocument, cb);
 };
 
-/**
- * 日付欄への入力を共通化（指定モードに切り替えてから値をセット）
- */
-const fillDateFields = (doc: Document, date: string): boolean => {
-  const { code, y, m, d } = parseDateString(normalize(date));
-  if ([code, y, m, d].some((value) => value === "")) return false;
-
-  (
-    doc.getElementById(
-      "InputHanketuYMD_Control_HanketuShiteiRadioButton",
-    ) as HTMLInputElement
-  ).checked = true;
-
-  setSelectBoxValue(doc, "InputHanketuYMD_Control_NENGOU_DropDownList0", code);
-
-  [
-    {
-      id: "InputHanketuYMD_Control_HANKETU_YEAR0",
-      value: y,
-    },
-    {
-      id: "InputHanketuYMD_Control_HANKETU_MONTH0",
-      value: m,
-    },
-    {
-      id: "InputHanketuYMD_Control_HANKETU_DAY0",
-      value: d,
-    },
-  ].forEach(({ id, value }) => {
-    (doc.getElementById(id) as HTMLInputElement).value = value;
-  });
-
-  return true;
-};
-
 /** 出典の詳細欄を整形する */
 const formatDetail = (detail: string): string => {
-  let fmt = detail;
+  let fmt = normalize(detail);
 
   // 文字列から最初の連続数字以降を抽出
   const m = fmt.match(/[0-9]+/);
-  if (m) fmt = fmt.slice(m.index);
+  if (!m) return "";
+  fmt = fmt.slice(m.index);
 
   // 「高刑速報（昭58）号145頁」のようなとき、括弧だけ全角にする
   const regDate = /\(([明大昭平令][0-9]{1,2})\)/;
@@ -236,6 +248,16 @@ const formatDetail = (detail: string): string => {
   return toFullWidthDigits(fmt);
 };
 
+/**
+ * フリーワード欄を埋める
+ */
+const fillFreewords = (doc: Document, words: string[]): void => {
+  for (const [i, id] of FREEWORD_IDS.entries()) {
+    const elem = doc.getElementById(id) as HTMLInputElement;
+    elem.value = words[i] ?? "";
+  }
+};
+
 const SMOOTH_CSV_COL = {
   COURT: 4,
   DATE: 6,
@@ -248,10 +270,9 @@ const SMOOTH_CSV_COL = {
  * SmoothCSVからのコピーを前提に、列はタブ区切りで扱う
  */
 export const pasteSmoothCsv: HotkeyActionWithClipboardText = (
-  ctx,
+  { bodyDocument },
   cb,
 ): boolean => {
-  const { bodyDocument } = ctx;
   const line = toHalfWidth(cb);
   const fields = line.split("\t").map((t) => (t.startsWith("?") ? "" : t));
   const court = fields[SMOOTH_CSV_COL.COURT]!;
@@ -271,14 +292,43 @@ export const pasteSmoothCsv: HotkeyActionWithClipboardText = (
     return false;
   }
 
-  const freewords = [formatDetail(detail)];
+  const freewords = [];
   const courtExpanded = expandCourtAbbrev(court);
   if (courtExpanded) freewords.push(courtExpanded);
+  freewords.push(formatDetail(detail));
 
-  for (const id of FREEWORD_IDS) {
-    const elem = bodyDocument.getElementById(id) as HTMLInputElement;
-    const v = freewords.pop();
-    elem.value = v ?? "";
-  }
+  fillFreewords(bodyDocument, freewords);
   return true;
+};
+
+/**
+ * 判例文字列からの貼り付け
+ * 例：「札幌地判令和3・3・17判時2487号3頁」
+ */
+export const pastePrecedent: HotkeyActionWithClipboardText = (
+  { bodyDocument },
+  cb,
+): boolean => {
+  const s = normalize(cb.replace(/\s/g, "").replace(/[\r\n]+/g, ""));
+  if (s.match(/lex\/db/i) && fillLexId(bodyDocument, s)) {
+    return true;
+  }
+
+  const caseNumberFillResult = fillCaseNumber(bodyDocument, s);
+  const filledTimestamp = fillDateFields(bodyDocument, s);
+
+  const freewords = [];
+
+  const courtName = deriveLeadingCourtName(s);
+  if (courtName) freewords.push(courtName);
+
+  if (filledTimestamp) {
+    const detail = formatDetail(s.slice(filledTimestamp.end));
+    if (detail) freewords.push(detail);
+  }
+  fillFreewords(bodyDocument, freewords);
+
+  return (
+    caseNumberFillResult || filledTimestamp !== null || 0 < freewords.length
+  );
 };

@@ -6,6 +6,7 @@ import {
   pasteCaseNumber,
   pasteDate,
   pasteLexId,
+  pastePrecedent,
   pasteSmoothCsv,
   pressSubmitButton,
 } from "./search-page";
@@ -124,6 +125,19 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     run: (ctx, cb) => {
       clearAllInputBox(ctx);
       if (pasteSmoothCsv(ctx, cb)) {
+        pressSubmitButton(ctx);
+        return true;
+      }
+      return false;
+    },
+  },
+  pastePrecedent: {
+    label: "判例文字列を貼り付けて検索",
+    scope: "search",
+    needsClipboard: true,
+    run: (ctx, cb) => {
+      clearAllInputBox(ctx);
+      if (pastePrecedent(ctx, cb)) {
         pressSubmitButton(ctx);
         return true;
       }

@@ -27,32 +27,71 @@ export const getCurrentClipboardText = async (): Promise<string> => {
 };
 
 /**
+ * 年号にコードを割り当てる。明治を1、令和を5にするのは検索ページの
+ * 日付選択ボックスの value に対応させている。
+ */
+const YEAR_LABEL_SOURCE = [
+  { code: "5", labels: ["令和", "令", "R"] },
+  { code: "4", labels: ["平成", "平", "H"] },
+  { code: "3", labels: ["昭和", "昭", "S"] },
+  { code: "2", labels: ["大正", "大", "T"] },
+  { code: "1", labels: ["明治", "明", "M"] },
+] as const;
+
+const YEAR_LABELS = new Map(
+  YEAR_LABEL_SOURCE.flatMap(({ code, labels }) =>
+    labels.map((label) => [label, code] as const),
+  ),
+);
+
+type YearLabel = Parameters<typeof YEAR_LABELS.get>[0];
+
+/**
  * 元号コードを取得する（令和→5、平成→4など）
  */
-export const getYearCode = (s: string): string => {
-  if (s.startsWith("令和") || s.startsWith("令")) return "5";
-  if (s.startsWith("平成") || s.startsWith("平")) return "4";
-  if (s.startsWith("昭和") || s.startsWith("昭")) return "3";
-  if (s.startsWith("大正") || s.startsWith("大")) return "2";
-  if (s.startsWith("明治") || s.startsWith("明")) return "1";
-  return "5";
+export const getYearCode = (s: string): string =>
+  YEAR_LABELS.get(s as YearLabel) ?? "";
+
+const TIMESTAMP_REGEX =
+  /(……)?(?<year>[0-9０-９]{1,2}|元)(（[0-9]{4}）)?[年・\.](?<month>[0-9０-９]{1,2})[月・\.](?<day>[0-9０-９]{1,2})日?/;
+
+const ALL_YEAR_LABELS = [...YEAR_LABELS.keys()];
+
+export type Timestamp = {
+  text: string;
+  start: number;
+  end: number;
+  date: {
+    label: string;
+    year: number;
+    month: number;
+    day: number;
+  };
 };
 
 /**
- * 元号付き日付を元号コードと3つの数値に分解
- * @returns [元号コード, 年, 月, 日]
+ * 日付文字列を抽出する
  */
-export const parseDateString = (
-  s: string,
-): { code: string; y: string; m: string; d: string } => {
-  const code = getYearCode(s);
-  const [y, m, d] = toHalfWidth(s)
-    .replace("元", "1")
-    .replace(/^[^\d]+/, "")
-    .replace(/[^\d]+$/, "")
-    .replace(/[^\d]+/g, "_")
-    .split("_");
-  return { code, y: y || "", m: m || "", d: d || "" };
+export const matchTimestamp = (s: string): Timestamp | null => {
+  const m = TIMESTAMP_REGEX.exec(s);
+  if (!m) return null;
+
+  const prefix = s.slice(0, m.index);
+  const label = ALL_YEAR_LABELS.find((l) => prefix.endsWith(l));
+  if (!label) return null;
+
+  const { year, month, day } = m.groups!;
+  return {
+    text: label + m[0],
+    start: m.index - label.length,
+    end: m.index + m[0].length,
+    date: {
+      label,
+      year: m[2] === "元" ? 1 : parseInt(toHalfWidth(year!)),
+      month: parseInt(toHalfWidth(month!)),
+      day: parseInt(toHalfWidth(day!)),
+    },
+  };
 };
 
 /**
