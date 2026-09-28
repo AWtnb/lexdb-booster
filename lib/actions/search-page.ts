@@ -345,7 +345,7 @@ export const pasteAndSearch: HotkeyActionWithClipboardText = (
   { bodyDocument },
   cb,
 ) => {
-  if (1 < cb.split("\t").length) {
+  if (10 <= cb.split("\t").length) {
     return pasteSmoothCsv(bodyDocument, cb);
   }
   return pastePrecedent(bodyDocument, cb);
