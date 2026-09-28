@@ -249,6 +249,18 @@ const formatDetail = (detail: string): string => {
 };
 
 /**
+ * wordsを最大15文字に切り分ける
+ */
+const sliceFreewords = (words: string[]): string[] => {
+  return words.flatMap((word) => {
+    if (word.length <= 15) return [word];
+    return Array.from({ length: Math.ceil(word.length / 15) }, (_, i) =>
+      word.slice(i * 15, (i + 1) * 15),
+    );
+  });
+};
+
+/**
  * フリーワード欄を埋める
  */
 const fillFreewords = (doc: Document, words: string[]): boolean => {
@@ -293,7 +305,9 @@ const pasteSmoothCsv = (doc: Document, cb: string): boolean => {
   if (courtExpanded) freewords.push(courtExpanded);
   freewords.push(formatDetail(detail));
 
-  return fillDateFields(doc, date) !== null || fillFreewords(doc, freewords);
+  const dateFillResult = fillDateFields(doc, date) !== null;
+  const freewordFillResult = fillFreewords(doc, sliceFreewords(freewords));
+  return dateFillResult || freewordFillResult;
 };
 
 /**
@@ -318,12 +332,9 @@ const pastePrecedent = (doc: Document, cb: string): boolean => {
     const detail = s.slice(filledTimestamp.end);
     freewords.push(formatDetail(detail));
   }
+  const freewordFillResult = fillFreewords(doc, sliceFreewords(freewords));
 
-  return (
-    caseNumberFillResult ||
-    filledTimestamp !== null ||
-    fillFreewords(doc, freewords)
-  );
+  return caseNumberFillResult || filledTimestamp !== null || freewordFillResult;
 };
 
 /**
