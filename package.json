@@ -1,5 +1,5 @@
 {
-  "name": " LEX/DB Booster",
+  "name": "LEX/DB Booster",
   "version": "0.0.2",
   "description": "",
   "main": "index.js",
@@ -31,3 +31,4 @@
     "wxt": "^0.21.4"
   }
 }
+
