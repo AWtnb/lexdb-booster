@@ -13,11 +13,10 @@ import {
   clearAllInputBox,
   cycleFreeWord,
   focusFreeWord,
+  pasteAndSearch,
   pasteCaseNumber,
   pasteDate,
   pasteLexId,
-  pastePrecedent,
-  pasteSmoothCsv,
   pressSubmitButton,
 } from "./search-page";
 import { gotoSyoshi } from "./zenbun-page";
@@ -118,26 +117,13 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     needsClipboard: false,
     run: (ctx) => cycleFreeWord(ctx),
   },
-  pasteSmoothCsv: {
-    label: "SmoothCSVから貼り付けて検索",
-    scope: "search",
-    needsClipboard: true,
-    run: (ctx, cb) => {
-      clearAllInputBox(ctx);
-      if (pasteSmoothCsv(ctx, cb)) {
-        pressSubmitButton(ctx);
-        return true;
-      }
-      return false;
-    },
-  },
-  pastePrecedent: {
+  pasteAndSearch: {
     label: "判例文字列を貼り付けて検索",
     scope: "search",
     needsClipboard: true,
     run: (ctx, cb) => {
       clearAllInputBox(ctx);
-      if (pastePrecedent(ctx, cb)) {
+      if (pasteAndSearch(ctx, cb)) {
         pressSubmitButton(ctx);
         return true;
       }

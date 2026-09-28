@@ -92,7 +92,7 @@ const fillCaseNumber = (doc: Document, s: string): boolean => {
  */
 export const pasteCaseNumber: HotkeyActionWithClipboardText = (
   { bodyDocument },
-  cb: string,
+  cb,
 ): boolean => {
   return fillCaseNumber(bodyDocument, cb);
 };
@@ -269,10 +269,7 @@ const SMOOTH_CSV_COL = {
  * 事件番号調査用のCSVから一括貼り付け
  * SmoothCSVからのコピーを前提に、列はタブ区切りで扱う
  */
-export const pasteSmoothCsv: HotkeyActionWithClipboardText = (
-  { bodyDocument },
-  cb,
-): boolean => {
+const pasteSmoothCsv = (doc: Document, cb: string): boolean => {
   const line = toHalfWidth(cb);
   const fields = line.split("\t").map((t) => (t.startsWith("?") ? "" : t));
   const court = fields[SMOOTH_CSV_COL.COURT]!;
@@ -280,15 +277,15 @@ export const pasteSmoothCsv: HotkeyActionWithClipboardText = (
   const detail = fields[SMOOTH_CSV_COL.DETAIL]!;
   const casenumber = fields[SMOOTH_CSV_COL.CASE_NUMBER]!;
 
-  if (fillLexId(bodyDocument, detail)) {
+  if (fillLexId(doc, detail)) {
     return true;
   }
 
-  if (fillCaseNumber(bodyDocument, casenumber)) {
+  if (fillCaseNumber(doc, casenumber)) {
     return true;
   }
 
-  if (!fillDateFields(bodyDocument, date)) {
+  if (!fillDateFields(doc, date)) {
     return false;
   }
 
@@ -297,7 +294,7 @@ export const pasteSmoothCsv: HotkeyActionWithClipboardText = (
   if (courtExpanded) freewords.push(courtExpanded);
   freewords.push(formatDetail(detail));
 
-  fillFreewords(bodyDocument, freewords);
+  fillFreewords(doc, freewords);
   return true;
 };
 
@@ -305,17 +302,14 @@ export const pasteSmoothCsv: HotkeyActionWithClipboardText = (
  * 判例文字列からの貼り付け
  * 例：「札幌地判令和3・3・17判時2487号3頁」
  */
-export const pastePrecedent: HotkeyActionWithClipboardText = (
-  { bodyDocument },
-  cb,
-): boolean => {
+const pastePrecedent = (doc: Document, cb: string): boolean => {
   const s = normalize(cb.replace(/\s/g, "").replace(/[\r\n]+/g, ""));
-  if (s.match(/lex\/db/i) && fillLexId(bodyDocument, s)) {
+  if (fillLexId(doc, s)) {
     return true;
   }
 
-  const caseNumberFillResult = fillCaseNumber(bodyDocument, s);
-  const filledTimestamp = fillDateFields(bodyDocument, s);
+  const caseNumberFillResult = fillCaseNumber(doc, s);
+  const filledTimestamp = fillDateFields(doc, s);
 
   const freewords = [];
 
@@ -326,9 +320,23 @@ export const pastePrecedent: HotkeyActionWithClipboardText = (
     const detail = formatDetail(s.slice(filledTimestamp.end));
     if (detail) freewords.push(detail);
   }
-  fillFreewords(bodyDocument, freewords);
+  fillFreewords(doc, freewords);
 
   return (
     caseNumberFillResult || filledTimestamp !== null || 0 < freewords.length
   );
+};
+
+/**
+ * タブ区切りの文字列であれば、SmoothCSVの貼り付け処理を行い、
+ * そうでなければ判例文字列の貼り付け処理を行う
+ */
+export const pasteAndSearch: HotkeyActionWithClipboardText = (
+  { bodyDocument },
+  cb,
+) => {
+  if (1 < cb.split("\t").length) {
+    return pasteSmoothCsv(bodyDocument, cb);
+  }
+  return pastePrecedent(bodyDocument, cb);
 };
