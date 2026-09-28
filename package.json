@@ -26,6 +26,7 @@
   "type": "module",
   "devDependencies": {
     "@types/node": "^26.6.2",
+    "@wxt-dev/auto-icons": "^1.1.2",
     "tsx": "^4.23.15",
     "wxt": "^0.21.4"
   }
