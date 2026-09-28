@@ -251,11 +251,14 @@ const formatDetail = (detail: string): string => {
 /**
  * フリーワード欄を埋める
  */
-const fillFreewords = (doc: Document, words: string[]): void => {
+const fillFreewords = (doc: Document, words: string[]): boolean => {
   for (const [i, id] of FREEWORD_IDS.entries()) {
     const elem = doc.getElementById(id) as HTMLInputElement;
     elem.value = words[i] ?? "";
   }
+  return FREEWORD_IDS.some(
+    (id) => (doc.getElementById(id) as HTMLInputElement).value !== "",
+  );
 };
 
 const SMOOTH_CSV_COL = {
@@ -285,17 +288,12 @@ const pasteSmoothCsv = (doc: Document, cb: string): boolean => {
     return true;
   }
 
-  if (!fillDateFields(doc, date)) {
-    return false;
-  }
-
   const freewords = [];
   const courtExpanded = expandCourtAbbrev(court);
   if (courtExpanded) freewords.push(courtExpanded);
   freewords.push(formatDetail(detail));
 
-  fillFreewords(doc, freewords);
-  return true;
+  return fillDateFields(doc, date) !== null || fillFreewords(doc, freewords);
 };
 
 /**
@@ -317,13 +315,14 @@ const pastePrecedent = (doc: Document, cb: string): boolean => {
   if (courtName) freewords.push(courtName);
 
   if (filledTimestamp) {
-    const detail = formatDetail(s.slice(filledTimestamp.end));
-    if (detail) freewords.push(detail);
+    const detail = s.slice(filledTimestamp.end);
+    freewords.push(formatDetail(detail));
   }
-  fillFreewords(doc, freewords);
 
   return (
-    caseNumberFillResult || filledTimestamp !== null || 0 < freewords.length
+    caseNumberFillResult ||
+    filledTimestamp !== null ||
+    fillFreewords(doc, freewords)
   );
 };
 

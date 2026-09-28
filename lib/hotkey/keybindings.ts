@@ -5,19 +5,19 @@ import type { ActionId, KeyBinding } from "../types";
  * hotkey-handler.tsに以前ハードコードされていた対応関係をそのまま移植したもの
  */
 export const DEFAULT_KEY_BINDINGS: KeyBinding[] = [
-  // 全ページ共通
-  { key: "A-Enter", actionId: "submitSearch" },
-  { key: "A-KeyL", actionId: "submitSearch" },
+  // 検索ページ以外
   { key: "KeyH", actionId: "goHome" },
 
   // 検索ページ
+  { key: "A-Enter", actionId: "submitSearch" },
+  { key: "A-KeyL", actionId: "submitSearch" },
+  { key: "KeyV", actionId: "pasteAndSearch" },
   { key: "A-KeyC", actionId: "clearAllInputBox" },
   { key: "KeyN", actionId: "pasteCaseNumber" },
   { key: "KeyD", actionId: "pasteDate" },
   { key: "KeyL", actionId: "pasteLexId" },
   { key: "KeyF", actionId: "focusFreeWord" },
   { key: "A-KeyA", actionId: "cycleFreeWord" },
-  { key: "KeyV", actionId: "pasteAndSearch" },
 
   // 検索結果ページ
   { key: "Enter", actionId: "openTopResult" },

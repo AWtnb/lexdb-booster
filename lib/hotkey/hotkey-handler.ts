@@ -28,6 +28,7 @@ const isScopeMatch = (
 
   if (entry.scope === "any") return true;
   if (entry.scope === "search") return isSearchPage(url);
+  if (entry.scope === "notSearch") return !isSearchPage(url);
   if (entry.scope === "searchResult") return isSearchResultPage(url);
   if (entry.scope === "detail") return isDetailPage(url);
   if (entry.scope === "zenbun") return isZenbunPage(url);

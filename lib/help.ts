@@ -14,7 +14,11 @@ import {
  */
 const getActiveScopes = (url: URL): Set<PageScope> => {
   const scopes = new Set<PageScope>(["any"]);
-  if (isSearchPage(url)) scopes.add("search");
+  if (isSearchPage(url)) {
+    scopes.add("search");
+  } else {
+    scopes.add("notSearch");
+  }
   if (isSearchResultPage(url)) scopes.add("searchResult");
   if (isDetailPage(url)) {
     scopes.add("detail");
@@ -40,7 +44,6 @@ export const getActiveBindings = (
     if (!entry) return [];
     if (!activeScopes.has(entry.scope)) return [];
     if (key.startsWith("Numpad")) return [];
-    if (key.endsWith("V")) return [];
     return [{ key: formatKeyString(key), label: entry.label }];
   });
 };

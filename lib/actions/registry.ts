@@ -24,6 +24,7 @@ import { gotoSyoshi } from "./zenbun-page";
 /** アクションが有効なページスコープ */
 export type PageScope =
   | "search"
+  | "notSearch"
   | "searchResult"
   | "detail"
   | "zenbun"
@@ -63,7 +64,7 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
   },
   goHome: {
     label: "検索画面に戻る",
-    scope: "any",
+    scope: "notSearch",
     needsClipboard: false,
     run: () => goHome(),
   },
@@ -80,8 +81,7 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     run: (ctx, cb) => {
       clearAllInputBox(ctx);
       if (pasteCaseNumber(ctx, cb)) {
-        pressSubmitButton(ctx);
-        return true;
+        return pressSubmitButton(ctx);
       }
       return false;
     },
@@ -99,8 +99,7 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     run: (ctx, cb) => {
       clearAllInputBox(ctx);
       if (pasteLexId(ctx, cb)) {
-        pressSubmitButton(ctx);
-        return true;
+        return pressSubmitButton(ctx);
       }
       return false;
     },
@@ -124,8 +123,7 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     run: (ctx, cb) => {
       clearAllInputBox(ctx);
       if (pasteAndSearch(ctx, cb)) {
-        pressSubmitButton(ctx);
-        return true;
+        return pressSubmitButton(ctx);
       }
       return false;
     },
@@ -179,7 +177,7 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     run: (ctx) => gotoSearchResults(ctx),
   },
   openTopResult: {
-    label: "検索結果の先頭を開く",
+    label: "検索結果の1件目を開く",
     scope: "searchResult",
     needsClipboard: false,
     run: (ctx) => openTopResult(ctx),
