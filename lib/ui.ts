@@ -152,14 +152,48 @@ export const toggleHelpOverlay = (
   ].join(";");
 
   const title = doc.createElement("div");
-  title.textContent = "⌨ キーボードショートカット";
   title.style.cssText = [
     "font-weight:bold",
     "margin-bottom:6px",
     "font-size:14px",
     "border-bottom:1px solid rgba(255,255,255,0.4)",
     "padding-bottom:4px",
+    "display:flex",
+    "align-items:center",
+    "gap:8px",
   ].join(";");
+
+  const titleText = doc.createElement("span");
+  titleText.textContent = "⌨ キーボードショートカット";
+
+  const toggleHint = doc.createElement("span");
+  toggleHint.style.cssText = [
+    "font-size:11px",
+    "font-weight:normal",
+    "opacity:0.7",
+    "display:flex",
+    "align-items:center",
+    "gap:4px",
+  ].join(";");
+
+  const hintLabel = doc.createElement("span");
+  hintLabel.textContent = "表示切替:";
+
+  const hintBadge = doc.createElement("span");
+  hintBadge.textContent = "?";
+  hintBadge.style.cssText = [
+    "font-family:monospace",
+    "background:rgba(255,255,255,0.15)",
+    "padding:1px 6px",
+    "border-radius:4px",
+    "display:inline-block",
+    "text-align:center",
+  ].join(";");
+
+  toggleHint.appendChild(hintLabel);
+  toggleHint.appendChild(hintBadge);
+  title.appendChild(titleText);
+  title.appendChild(toggleHint);
   overlay.appendChild(title);
 
   for (const { key, label } of bindings) {
