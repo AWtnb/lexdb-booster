@@ -12,7 +12,7 @@ import { setSelectBoxValue } from "../ui";
 
 /**
  * 文字列を正規化する
- * （半角カタカナ、不要な文字の削除など）
+ * （半角化して先頭のクエスチョンマークを削除する）
  */
 const normalize = (s: string): string => {
   return toHalfWidth(s).replace(/^\?/, "");
@@ -285,8 +285,7 @@ const SMOOTH_CSV_COL = {
  * SmoothCSVからのコピーを前提に、列はタブ区切りで扱う
  */
 const pasteSmoothCsv = (doc: Document, cb: string): boolean => {
-  const line = toHalfWidth(cb);
-  const fields = line.split("\t").map((t) => (t.startsWith("?") ? "" : t));
+  const fields = cb.split("\t").map(normalize);
   const court = fields[SMOOTH_CSV_COL.COURT]!;
   const date = fields[SMOOTH_CSV_COL.DATE]!;
   const detail = fields[SMOOTH_CSV_COL.DETAIL]!;
