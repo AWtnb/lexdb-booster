@@ -328,7 +328,7 @@ const pastePrecedent = (doc: Document, cb: string): boolean => {
   const courtName = deriveLeadingCourtName(s);
   if (courtName) freewords.push(courtName);
 
-  if (filledTimestamp) {
+  if (!caseNumberFillResult && filledTimestamp) {
     const detail = s.slice(filledTimestamp.end);
     freewords.push(formatDetail(detail));
   }
