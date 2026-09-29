@@ -70,6 +70,7 @@ const fillCaseNumber = (doc: Document, s: string): boolean => {
   const caseNumber = parseCaseNumber(top);
   if (!caseNumber) return false;
   const { code, year, sign, num } = caseNumber;
+  console.log(caseNumber);
 
   setSelectBoxValue(
     doc,

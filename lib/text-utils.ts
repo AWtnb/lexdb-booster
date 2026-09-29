@@ -115,7 +115,7 @@ export const parseCaseNumber = (
     .split("_");
   if (!fullYear || !sign || !fullNum) return null;
   return {
-    code: getYearCode(fullYear),
+    code: getYearCode(fullYear.replace(/[0-9]+年/g, "")),
     year: parseInt(fullYear.replace(/[^0-9]/g, "")),
     sign: sign,
     num: parseInt(fullNum.replace(/[^0-9]/g, "")),
