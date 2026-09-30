@@ -1,39 +1,72 @@
-import { buildKeyString } from "@/lib/keystring";
-import { isEventOnInputableElem } from "@/lib/lexdb/hotkey/hotkey-setup";
+import { buildKeyString, isEventOnInputableElem } from "@/lib/keystring";
 import { getCurrentClipboardText } from "@/lib/text-utils";
 import { defineContentScript } from "wxt/utils/define-content-script";
 import { pasteDateField } from "./actions";
 
-const WESTLAW_KEY_BINDINGS: {
+/**
+ * 判例検索ページでフリーワード検索欄にフォーカスがあたってしまうのを抑制する
+ */
+const suppressInitialFocus = () => {
+  const ft = document.getElementById("ft");
+  if (!ft) return;
+
+  const onFocus = () => {
+    ft.blur();
+    ft.removeEventListener("focus", onFocus);
+  };
+
+  ft.addEventListener("focus", onFocus);
+};
+
+type WestlawKeyBinding = {
   key: string;
   action: (clipboardText: string) => boolean;
-}[] = [{ key: "KeyV", action: pasteDateField }];
+};
 
-const handleHotkey = async (pressed: string) => {
-  for (const binding of WESTLAW_KEY_BINDINGS) {
+const WESTLAW_SEARCH_KEY_BINDINGS: WestlawKeyBinding[] = [
+  { key: "KeyV", action: pasteDateField },
+];
+
+const WESTLAW_COPY_KEY_BINDINGS: WestlawKeyBinding[] = [
+  { key: "KeyV", action: pasteDateField },
+];
+
+const handleHotkey = async (pressed: string, bindings: WestlawKeyBinding[]) => {
+  for (const binding of bindings) {
     if (binding.key !== pressed) continue;
     const cb = await getCurrentClipboardText();
     binding.action(cb);
   }
 };
 
+const setupHotkeys = (bindings: WestlawKeyBinding[]) => {
+  document.onkeyup = async (keyEvent) => {
+    console.log({ key: keyEvent.key }, { code: keyEvent.code });
+    if (isEventOnInputableElem(keyEvent)) return;
+    const pressed = buildKeyString(keyEvent);
+    await handleHotkey(pressed, bindings);
+  };
+};
+
 export default defineContentScript({
   matches: [
+    "https://go.westlawjapan.com/wljp/app/doc*",
     "https://go.westlawjapan.com/wljp/app/search/template*",
     "https://go.westlawjapan.com/wljp/app/welcome*",
   ],
   main: () => {
-    if (document.location.href.includes("wljp/app/welcome")) {
+    const url = document.location.href;
+    if (url.includes("wljp/app/welcome")) {
       document.getElementById("ft")?.focus();
       return;
     }
-    document.getElementById("ft")?.blur();
-
-    document.onkeyup = async (keyEvent) => {
-      console.log({ key: keyEvent.key }, { code: keyEvent.code });
-      if (isEventOnInputableElem(keyEvent)) return;
-      const pressed = buildKeyString(keyEvent);
-      await handleHotkey(pressed);
-    };
+    if (url.includes("wljp/app/search/template")) {
+      suppressInitialFocus();
+      setupHotkeys(WESTLAW_SEARCH_KEY_BINDINGS);
+    }
+    if (url.includes("wljp/app/doc")) {
+      suppressInitialFocus();
+      setupHotkeys(WESTLAW_COPY_KEY_BINDINGS);
+    }
   },
 });
