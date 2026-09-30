@@ -256,7 +256,9 @@ const sliceFreewords = (words: string[]): string[] => {
 const fillFreewords = (doc: Document, words: string[]): boolean => {
   for (const [i, id] of FREEWORD_IDS.entries()) {
     const elem = doc.getElementById(id) as HTMLInputElement;
-    elem.value = words[i] ?? "";
+    elem.value = (words[i] ?? "")
+      .replace(/[鯵鰺][ヶケ]/, "鯵ケ")
+      .replace("木曽", "木曾");
   }
   return FREEWORD_IDS.some(
     (id) => (doc.getElementById(id) as HTMLInputElement).value !== "",
