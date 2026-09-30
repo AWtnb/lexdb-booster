@@ -87,8 +87,8 @@ const setupHotkeys = (): void => {
 
     if (isSearchResultPage(url)) {
       const anchors = getSyoshiAnchors(bodyDocument);
-      // 2つで1セット（書誌リンク + 何か）なので、1件 = anchors.length === 2
-      if (anchors.length === 2) {
+      // 2つで1セット（書誌リンク + 何か）だが、大審院判例など全文ページがない場合は1件
+      if (anchors.length <= 2) {
         openTopResult({
           url,
           keyEvent: null as unknown as KeyboardEvent,
