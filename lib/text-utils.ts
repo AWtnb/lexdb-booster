@@ -38,6 +38,10 @@ const YEAR_LABEL_SOURCE = [
   { code: "1", labels: ["明治", "明", "M"] },
 ] as const;
 
+/**
+ * 年号ラベルをコードに変換するマップ。
+ * キーは「令和」「平」「H」などのラベル、値は「5」「4」などのコード。
+ */
 const YEAR_LABELS = new Map(
   YEAR_LABEL_SOURCE.flatMap(({ code, labels }) =>
     labels.map((label) => [label, code] as const),
@@ -94,30 +98,35 @@ export const matchTimestamp = (s: string): Timestamp | null => {
   };
 };
 
+const getCaseNumberMatch = (s: string): RegExpExecArray | null => {
+  const fullMatch =
+    /(?<label>明治|大正|昭和|平成|令和)(?<year>[0-9]{1,2}|元)年(?<sign>.?\(.{1,3}\))第(?<num>[0-9]+)号/.exec(
+      s,
+    );
+  if (fullMatch) return fullMatch;
+  return /(?<label>明|大|昭|平|令)(?<year>[0-9]{1,2}|元)年?(?<sign>.?\(.{1,3}\))(?<num>[0-9]+)号?/.exec(
+    s,
+  );
+};
+
 /**
- * 文字列（の先頭）の事件番号をパースする
+ * 文字列で最初に登場する事件番号をパースする
  * 例：
  *    平成２０年（行コ）第３１号→{ code: "4", year: 20, sign: "行コ", num: 31 }
  */
 export const parseCaseNumber = (
   str: string,
 ): { code: string; year: number; sign: string; num: number } | null => {
-  const [top] = toHalfWidth(str)
-    .replaceAll("?", "")
-    .replace("元年", "1年")
-    .replace(/^\(/, "")
-    .replace(/\)$/, "")
-    .split("、");
-  if (!top) return null;
-  const [fullYear, sign, fullNum] = top
-    .replace(/号.+$/, "号")
-    .replace(/[\(\)]/g, "_")
-    .split("_");
-  if (!fullYear || !sign || !fullNum) return null;
-  return {
-    code: getYearCode(fullYear.replace(/[0-9]+年/g, "")),
-    year: parseInt(fullYear.replace(/[^0-9]/g, "")),
-    sign: sign,
-    num: parseInt(fullNum.replace(/[^0-9]/g, "")),
-  };
+  const m = getCaseNumberMatch(toHalfWidth(str));
+  if (!m) return null;
+  const { label, year, sign, num } = m.groups!;
+  if (label && year && sign && num) {
+    return {
+      code: getYearCode(label),
+      year: year === "元" ? 1 : parseInt(year),
+      sign: sign.replaceAll("(", "").replaceAll(")", ""),
+      num: parseInt(num),
+    };
+  }
+  return null;
 };

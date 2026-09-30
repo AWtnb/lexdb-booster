@@ -61,16 +61,9 @@ export const pressSubmitButton: HotkeyAction = ({
  * 事件番号欄を埋める
  */
 const fillCaseNumber = (doc: Document, s: string): boolean => {
-  const reg = new RegExp(
-    "(明治|大正|昭和|平成|令和)([0-9]{1,2}|元)年\\(.{1,3}\\)第[0-9]+号",
-  );
-  const m = reg.exec(normalize(s));
-  if (!m) return false;
-  const top = s.slice(m.index);
-  const caseNumber = parseCaseNumber(top);
+  const caseNumber = parseCaseNumber(normalize(s));
   if (!caseNumber) return false;
   const { code, year, sign, num } = caseNumber;
-  console.log(caseNumber);
 
   setSelectBoxValue(
     doc,

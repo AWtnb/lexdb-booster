@@ -75,7 +75,6 @@ const getCourtDesicion = (doc: Document): string => {
     .replace(/\(.+?\)/, "")
     .split("/");
   if (!category || !courtName) return "";
-  console.log(courtName);
   return `${abbreviateCourtName(courtName)}${MAJOR_CATEGORY_MAPPING[category] || ""}`;
 };
 

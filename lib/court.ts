@@ -119,7 +119,6 @@ export const expandCourtAbbrev = (s: string): string => {
  * 裁判所の完全表記を略称に変換する（例: "東京地方裁判所" → "東京地"）
  */
 export const abbreviateCourtName = (s: string): string => {
-  console.log(s);
   // 最高裁判所の場合
   if (s.startsWith("最高裁判所")) {
     if (s === "最高裁判所第一小法廷") return "最一小";
