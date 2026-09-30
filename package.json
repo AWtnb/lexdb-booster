@@ -11,7 +11,7 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "postinstall": "wxt prepare",
-    "release": "tsx scripts/release.ts"
+    "release": "wxt build && tsx scripts/release.ts"
   },
   "keywords": [],
   "author": "",
@@ -31,3 +31,4 @@
     "wxt": "^0.21.4"
   }
 }
+
