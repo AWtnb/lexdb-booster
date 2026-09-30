@@ -13,12 +13,16 @@ export const toHalfWidth = (str: string): string => {
 };
 
 /**
- * 数字を半角から全角に変換する
+ * 半角英数字・記号を全角に変換する
+ * 範囲：
+ *     - 半角アルファベット（`A`～`Z`、`a`～`z`）
+ *     - 半角数字（`0`～`9`）
+ *     - 半角記号（`!`～`~`）
  */
-export const toFullWidthDigits = (input: string | number): string => {
-  const str = String(input);
-  return str.replace(/[0-9]/g, (match) => {
-    return String.fromCharCode(match.charCodeAt(0) + 65248);
+export const toFullWidth = (str: string): string => {
+  if (!str) return str;
+  return str.replace(/[\u0021-\u007E]/g, (match) => {
+    return String.fromCharCode(match.charCodeAt(0) + 0xfee0);
   });
 };
 

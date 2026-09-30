@@ -3,7 +3,7 @@ import {
   getYearCode,
   matchTimestamp,
   parseCaseNumber,
-  toFullWidthDigits,
+  toFullWidth,
   toHalfWidth,
   type Timestamp,
 } from "../text-utils";
@@ -222,14 +222,10 @@ export const pasteLexId: HotkeyActionWithClipboardText = (
 const formatDetail = (detail: string): string => {
   let fmt = normalize(detail);
 
-  // 文字列から最初の連続数字以降を抽出
-  const m = fmt.match(/[0-9]+/);
+  // 文字列から最初の連続数字もしくは「（昭58）号145頁」（高刑速報の出典）以降を抽出
+  const m = fmt.match(/(\([明大昭平令])?[0-9]+/);
   if (!m) return "";
   fmt = fmt.slice(m.index);
-
-  // 「高刑速報（昭58）号145頁」のようなとき、括弧だけ全角にする
-  const regDate = /\(([明大昭平令][0-9]{1,2})\)/;
-  fmt = fmt.replace(regDate, (_, y) => `（${y}）`);
 
   // 「=」以前を除去する（合併号対策）
   const last = fmt.split("=").pop();
@@ -239,7 +235,7 @@ const formatDetail = (detail: string): string => {
   const regSecondPage = /[0-9]+頁[②㋺ロ](事件)?/;
   fmt = fmt.replace(regSecondPage, "");
 
-  return toFullWidthDigits(fmt);
+  return toFullWidth(fmt);
 };
 
 /**
