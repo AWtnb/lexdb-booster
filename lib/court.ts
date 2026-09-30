@@ -173,12 +173,6 @@ export const abbreviateCourtName = (s: string): string => {
 const lenOrdered = (lines: string[]): string[] =>
   [...lines].sort((a, b) => b.length - a.length);
 
-const getLeadingCourtBranch = (s: string): string => {
-  const m = /^.+支部?/.exec(s);
-  if (!m) return "";
-  return `${m[0]}部`.replace(/部部$/, "部");
-};
-
 /*
  * 文字列の先頭から裁判所名を抽出する
  * 例: "東京地" → "東京地方裁判所"
@@ -204,8 +198,16 @@ export const deriveLeadingCourtName = (s: string): string => {
     for (const name of lenOrdered(names)) {
       const m = new RegExp(`^${name}${suffix}${abbr}`).exec(s);
       if (!m) continue;
-      const branch = getLeadingCourtBranch(s.slice(m[0].length));
-      return `${name}${full}${branch}`;
+      const rest = s.slice(m[0].length);
+      const branchMatch = /^.+支部?/.exec(rest);
+      if (branchMatch) {
+        let branch = branchMatch[0];
+        if (!branch.endsWith("部")) {
+          branch = branch + "部";
+        }
+        return `${name}${full}${branch}`;
+      }
+      return `${name}${full}`;
     }
   }
 
@@ -218,4 +220,12 @@ export const deriveLeadingCourtName = (s: string): string => {
   }
 
   return "";
+};
+
+/**
+ * 裁判所名の正規化
+ * アジガサワ問題とキソ問題
+ */
+export const formatCourtName = (name: string): string => {
+  return name.replace(/[鯵鰺][ヶケ]/, "鯵ケ").replace("木曽", "木曾");
 };

@@ -1,4 +1,8 @@
-import { deriveLeadingCourtName, expandCourtAbbrev } from "../court";
+import {
+  deriveLeadingCourtName,
+  expandCourtAbbrev,
+  formatCourtName,
+} from "../court";
 import {
   getYearCode,
   matchTimestamp,
@@ -227,9 +231,8 @@ const formatDetail = (detail: string): string => {
   if (!m) return "";
   fmt = fmt.slice(m.index);
 
-  // 「=」以前を除去する（合併号対策）
-  const last = fmt.split("=").pop();
-  if (last) fmt = last;
+  // 「=」は中黒点に（合併号対策）
+  fmt = fmt.replace("=", "・");
 
   // 2番目以降の場合は頁部分を除去する
   const regSecondPage = /[0-9]+頁[②㋺ロ](事件)?/;
@@ -256,9 +259,7 @@ const sliceFreewords = (words: string[]): string[] => {
 const fillFreewords = (doc: Document, words: string[]): boolean => {
   for (const [i, id] of FREEWORD_IDS.entries()) {
     const elem = doc.getElementById(id) as HTMLInputElement;
-    elem.value = (words[i] ?? "")
-      .replace(/[鯵鰺][ヶケ]/, "鯵ケ")
-      .replace("木曽", "木曾");
+    elem.value = words[i] ?? "";
   }
   return FREEWORD_IDS.some(
     (id) => (doc.getElementById(id) as HTMLInputElement).value !== "",
@@ -293,7 +294,7 @@ const pasteSmoothCsv = (doc: Document, cb: string): boolean => {
 
   const freewords = [];
   const courtExpanded = expandCourtAbbrev(court);
-  if (courtExpanded) freewords.push(courtExpanded);
+  if (courtExpanded) freewords.push(formatCourtName(courtExpanded));
   freewords.push(formatDetail(detail));
 
   const dateFillResult = fillDateFields(doc, date) !== null;
@@ -317,7 +318,7 @@ const pastePrecedent = (doc: Document, cb: string): boolean => {
   const freewords = [];
 
   const courtName = deriveLeadingCourtName(s);
-  if (courtName) freewords.push(courtName);
+  if (courtName) freewords.push(formatCourtName(courtName));
 
   if (!caseNumberFillResult && filledTimestamp) {
     const detail = s.slice(filledTimestamp.end);
