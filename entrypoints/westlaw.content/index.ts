@@ -1,7 +1,12 @@
 import { buildKeyString, isEventOnInputableElem } from "@/lib/keystring";
 import { getCurrentClipboardText } from "@/lib/text-utils";
 import { defineContentScript } from "wxt/utils/define-content-script";
-import { pasteDateField } from "./actions";
+import {
+  goSearchHome,
+  pasteDateField,
+  pressClearButton,
+  pressSubmitButton,
+} from "./actions";
 
 /**
  * 判例検索ページでフリーワード検索欄にフォーカスがあたってしまうのを抑制する
@@ -25,10 +30,19 @@ type WestlawKeyBinding = {
 
 const WESTLAW_SEARCH_KEY_BINDINGS: WestlawKeyBinding[] = [
   { key: "KeyV", action: pasteDateField },
+  { key: "A-Enter", action: pressSubmitButton },
+  { key: "A-KeyL", action: pressSubmitButton },
+  { key: "A-KeyC", action: pressClearButton },
 ];
 
-const WESTLAW_COPY_KEY_BINDINGS: WestlawKeyBinding[] = [
-  { key: "KeyV", action: pasteDateField },
+const WESTLAW_DETAIL_KEY_BINDINGS: WestlawKeyBinding[] = [
+  {
+    key: "KeyH",
+    action: (_) => {
+      goSearchHome();
+      return true;
+    },
+  },
 ];
 
 const handleHotkey = async (pressed: string, bindings: WestlawKeyBinding[]) => {
@@ -54,6 +68,7 @@ export default defineContentScript({
     "https://go.westlawjapan.com/wljp/app/search/template*",
     "https://go.westlawjapan.com/wljp/app/welcome*",
   ],
+  world: "MAIN",
   main: () => {
     const url = document.location.href;
     if (url.includes("wljp/app/welcome")) {
@@ -66,7 +81,7 @@ export default defineContentScript({
     }
     if (url.includes("wljp/app/doc")) {
       suppressInitialFocus();
-      setupHotkeys(WESTLAW_COPY_KEY_BINDINGS);
+      setupHotkeys(WESTLAW_DETAIL_KEY_BINDINGS);
     }
   },
 });
