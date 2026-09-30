@@ -1,5 +1,5 @@
-import { abbreviateCourtName } from "../court";
-import { toHalfWidth } from "../text-utils";
+import { abbreviateCourtName } from "@/lib/court";
+import { toHalfWidth } from "@/lib/text-utils";
 import type { HotkeyAction } from "../types";
 import { copyString } from "../ui";
 

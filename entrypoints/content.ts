@@ -1,4 +1,4 @@
-import { initializeScript } from "@/lib/hotkey/hotkey-setup";
+import { initializeScript } from "@/lib/lexdb/hotkey/hotkey-setup";
 import { defineContentScript } from "wxt/utils/define-content-script";
 
 export default defineContentScript({

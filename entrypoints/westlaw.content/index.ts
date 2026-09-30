@@ -1,5 +1,5 @@
-import { isEventOnInputableElem } from "@/lib/hotkey/hotkey-setup";
-import { buildKeyString } from "@/lib/hotkey/keystring";
+import { buildKeyString } from "@/lib/keystring";
+import { isEventOnInputableElem } from "@/lib/lexdb/hotkey/hotkey-setup";
 import { getCurrentClipboardText } from "@/lib/text-utils";
 import { defineContentScript } from "wxt/utils/define-content-script";
 import { pasteDateField } from "./actions";
@@ -18,8 +18,17 @@ const handleHotkey = async (pressed: string) => {
 };
 
 export default defineContentScript({
-  matches: ["https://go.westlawjapan.com/wljp/app/search/template*"],
+  matches: [
+    "https://go.westlawjapan.com/wljp/app/search/template*",
+    "https://go.westlawjapan.com/wljp/app/welcome*",
+  ],
   main: () => {
+    if (document.location.href.includes("wljp/app/welcome")) {
+      document.getElementById("ft")?.focus();
+      return;
+    }
+    document.getElementById("ft")?.blur();
+
     document.onkeyup = async (keyEvent) => {
       console.log({ key: keyEvent.key }, { code: keyEvent.code });
       if (isEventOnInputableElem(keyEvent)) return;

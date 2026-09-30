@@ -1,7 +1,7 @@
+import { formatKeyString } from "../keystring";
 import type { PageScope } from "./actions/registry";
 import { ACTION_REGISTRY } from "./actions/registry";
 import { DEFAULT_KEY_BINDINGS } from "./hotkey/keybindings";
-import { formatKeyString } from "./hotkey/keystring";
 import {
   isDetailPage,
   isSearchPage,

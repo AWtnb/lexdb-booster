@@ -2,7 +2,7 @@ import {
   deriveLeadingCourtName,
   expandCourtAbbrev,
   formatCourtName,
-} from "../court";
+} from "@/lib/court";
 import {
   getYearCode,
   matchTimestamp,
@@ -10,7 +10,7 @@ import {
   toFullWidth,
   toHalfWidth,
   type Timestamp,
-} from "../text-utils";
+} from "@/lib/text-utils";
 import type { HotkeyAction, HotkeyActionWithClipboardText } from "../types";
 import { setSelectBoxValue } from "../ui";
 
