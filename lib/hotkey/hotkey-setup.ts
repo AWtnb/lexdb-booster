@@ -11,6 +11,20 @@ const RETRY_INTERVAL_MS = 3000;
 const MAX_RETRIES = 5;
 
 /**
+ * イベントが入力可能な要素上で発生したかどうかを判定する
+ */
+export const isEventOnInputableElem = (keyEvent: KeyboardEvent): boolean => {
+  const target = keyEvent.target as HTMLElement;
+  if (target.tagName === "TEXTAREA") return true;
+  if (target.tagName === "INPUT") {
+    return !["checkbox", "radio"].includes(
+      (target as HTMLInputElement).type.toLowerCase(),
+    );
+  }
+  return false;
+};
+
+/**
  * ホットキー設定関数
  * フレーム取得・スタイル適用・keyupハンドラの登録を行う
  */
@@ -58,14 +72,7 @@ const setupHotkeys = (): void => {
     bodyDocument.onkeyup = async (keyEvent) => {
       console.log({ key: keyEvent.key }, { code: keyEvent.code });
       const pressed = buildKeyString(keyEvent);
-
-      const target = keyEvent.target as HTMLElement;
-      const isInputableElem =
-        target.tagName === "TEXTAREA" ||
-        (target.tagName === "INPUT" &&
-          !["checkbox", "radio"].includes(
-            (target as HTMLInputElement).type.toLowerCase(),
-          ));
+      const isInputableElem = isEventOnInputableElem(keyEvent);
 
       // スラッシュもしくは?キーでヘルプ表示トグル
       if ((pressed === "Slash" || pressed === "S-Slash") && !isInputableElem) {
