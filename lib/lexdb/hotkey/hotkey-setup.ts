@@ -1,4 +1,4 @@
-import { buildKeyString } from "@/lib/keystring";
+import { buildKeyString, isEventOnInputableElem } from "@/lib/keystring";
 import { getSyoshiAnchors, openTopResult } from "../actions/result-page";
 import { getActiveBindings } from "../help";
 import { isDetailPage, isSearchResultPage } from "../page";
@@ -9,20 +9,6 @@ import { handleHotkey } from "./hotkey-handler";
 
 const RETRY_INTERVAL_MS = 3000;
 const MAX_RETRIES = 5;
-
-/**
- * イベントが入力可能な要素上で発生したかどうかを判定する
- */
-export const isEventOnInputableElem = (keyEvent: KeyboardEvent): boolean => {
-  const target = keyEvent.target as HTMLElement;
-  if (target.tagName === "TEXTAREA") return true;
-  if (target.tagName === "INPUT") {
-    return !["checkbox", "radio"].includes(
-      (target as HTMLInputElement).type.toLowerCase(),
-    );
-  }
-  return false;
-};
 
 /**
  * ホットキー設定関数

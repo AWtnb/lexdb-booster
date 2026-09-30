@@ -78,3 +78,17 @@ export const formatKeyString = (key: string): string => {
   parts.push(mainKey);
   return parts.join("+");
 };
+
+/**
+ * イベントが入力可能な要素上で発生したかどうかを判定する
+ */
+export const isEventOnInputableElem = (keyEvent: KeyboardEvent): boolean => {
+  const target = keyEvent.target as HTMLElement;
+  if (target.tagName === "TEXTAREA") return true;
+  if (target.tagName === "INPUT") {
+    return !["checkbox", "radio"].includes(
+      (target as HTMLInputElement).type.toLowerCase(),
+    );
+  }
+  return false;
+};
