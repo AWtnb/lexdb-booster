@@ -98,7 +98,7 @@ export const copyCaseNumber: HotkeyAction = ({ bodyDocument }): boolean => {
   }
   const lexID = getDisplayedLexID(bodyDocument);
   if (lexID) {
-    copyString(bodyDocument, `事件番号なし。LEX/DB ${lexID}`);
+    copyString(bodyDocument, `事件番号なし（LEX/DB ${lexID}）`);
     return true;
   }
   return false;
