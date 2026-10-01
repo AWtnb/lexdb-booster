@@ -3,8 +3,10 @@ import { getCurrentClipboardText } from "@/lib/text-utils";
 import { defineContentScript } from "wxt/utils/define-content-script";
 import {
   goSearchHome,
+  pasteAndSearch,
   pasteCaseNumber,
   pasteDateField,
+  pasteWljpId,
   pressClearButton,
   pressSubmitButton,
 } from "./actions";
@@ -32,11 +34,11 @@ type WestlawKeyBinding = {
 const WESTLAW_SEARCH_KEY_BINDINGS: WestlawKeyBinding[] = [
   { key: "KeyD", action: pasteDateField },
   { key: "KeyN", action: pasteCaseNumber },
+  { key: "KeyL", action: pasteWljpId },
   { key: "A-Enter", action: pressSubmitButton },
   { key: "A-KeyL", action: pressSubmitButton },
   { key: "A-KeyC", action: pressClearButton },
-  // { key: "KeyN", actionId: "pasteCaseNumber" },
-  // { key: "KeyV", actionId: "pastePrecedent" },
+  { key: "KeyV", action: pasteAndSearch },
 ];
 
 const WESTLAW_DETAIL_KEY_BINDINGS: WestlawKeyBinding[] = [
@@ -47,6 +49,13 @@ const WESTLAW_DETAIL_KEY_BINDINGS: WestlawKeyBinding[] = [
       return true;
     },
   },
+  // { key: "KeyC", action:  },
+  // { key: "KeyQ", action:  },
+  // { key: "KeyI", action:  },
+  // { key: "C-KeyI", action:  },
+  // { key: "S-KeyI", action:  },
+  // { key: "KeyZ", action:  },
+  // 検索結果のn件目を開く
 ];
 
 const handleHotkey = async (pressed: string, bindings: WestlawKeyBinding[]) => {
@@ -72,7 +81,6 @@ export default defineContentScript({
     "https://go.westlawjapan.com/wljp/app/search*",
     "https://go.westlawjapan.com/wljp/app/welcome*",
   ],
-  world: "MAIN",
   main: () => {
     const url = document.location.href;
     if (url.includes("wljp/app/welcome")) {

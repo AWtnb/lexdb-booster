@@ -4,12 +4,12 @@ import {
   formatCourtName,
 } from "@/lib/court";
 import {
+  formatDetail,
   getYearCode,
   matchTimestamp,
   normalize,
   parseCaseNumber,
   SMOOTH_CSV_COL,
-  toFullWidth,
   type Timestamp,
 } from "@/lib/text-utils";
 import type { HotkeyAction, HotkeyActionWithClipboardText } from "../types";
@@ -213,25 +213,6 @@ export const pasteLexId: HotkeyActionWithClipboardText = (
   cb,
 ): boolean => {
   return fillLexId(bodyDocument, cb);
-};
-
-/** 出典の詳細欄を整形する */
-const formatDetail = (detail: string): string => {
-  let fmt = normalize(detail);
-
-  // 文字列から最初の連続数字もしくは「（昭58）号145頁」（高刑速報の出典）以降を抽出
-  const m = fmt.match(/(\([明大昭平令])?[0-9]+/);
-  if (!m) return "";
-  fmt = fmt.slice(m.index);
-
-  // 「=」は中黒点に（合併号対策）
-  fmt = fmt.replace("=", "・");
-
-  // 2番目以降の場合は頁部分を除去する
-  const regSecondPage = /[0-9]+頁[②㋺ロ](事件)?/;
-  fmt = fmt.replace(regSecondPage, "");
-
-  return toFullWidth(fmt);
 };
 
 /**
