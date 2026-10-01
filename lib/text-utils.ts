@@ -1,3 +1,10 @@
+export const SMOOTH_CSV_COL = {
+  COURT: 4,
+  DATE: 6,
+  DETAIL: 8,
+  CASE_NUMBER: 9,
+} as const;
+
 /**
  * 全角英数字・記号を半角に変換する
  * 範囲：
@@ -10,6 +17,14 @@ export const toHalfWidth = (str: string): string => {
   return str.replace(/[\uFF01-\uFF5E]/g, (match) => {
     return String.fromCharCode(match.charCodeAt(0) - 0xfee0);
   });
+};
+
+/**
+ * 文字列を正規化する
+ * （半角化して先頭のクエスチョンマークを削除する）
+ */
+export const normalize = (s: string): string => {
+  return toHalfWidth(s).replace(/^\?/, "");
 };
 
 /**
@@ -34,7 +49,7 @@ export const getCurrentClipboardText = async (): Promise<string> => {
  * 年号にコードを割り当てる。明治を1、令和を5にするのは検索ページの
  * 日付選択ボックスの value に対応させている。
  */
-const YEAR_LABEL_SOURCE = [
+export const YEAR_LABEL_SOURCE = [
   { code: "5", labels: ["令和", "令", "R"] },
   { code: "4", labels: ["平成", "平", "H"] },
   { code: "3", labels: ["昭和", "昭", "S"] },

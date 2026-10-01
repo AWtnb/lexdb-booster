@@ -3,6 +3,7 @@ import { getCurrentClipboardText } from "@/lib/text-utils";
 import { defineContentScript } from "wxt/utils/define-content-script";
 import {
   goSearchHome,
+  pasteCaseNumber,
   pasteDateField,
   pressClearButton,
   pressSubmitButton,
@@ -29,10 +30,13 @@ type WestlawKeyBinding = {
 };
 
 const WESTLAW_SEARCH_KEY_BINDINGS: WestlawKeyBinding[] = [
-  { key: "KeyV", action: pasteDateField },
+  { key: "KeyD", action: pasteDateField },
+  { key: "KeyN", action: pasteCaseNumber },
   { key: "A-Enter", action: pressSubmitButton },
   { key: "A-KeyL", action: pressSubmitButton },
   { key: "A-KeyC", action: pressClearButton },
+  // { key: "KeyN", actionId: "pasteCaseNumber" },
+  // { key: "KeyV", actionId: "pastePrecedent" },
 ];
 
 const WESTLAW_DETAIL_KEY_BINDINGS: WestlawKeyBinding[] = [
@@ -65,7 +69,7 @@ const setupHotkeys = (bindings: WestlawKeyBinding[]) => {
 export default defineContentScript({
   matches: [
     "https://go.westlawjapan.com/wljp/app/doc*",
-    "https://go.westlawjapan.com/wljp/app/search/template*",
+    "https://go.westlawjapan.com/wljp/app/search*",
     "https://go.westlawjapan.com/wljp/app/welcome*",
   ],
   world: "MAIN",
@@ -75,7 +79,7 @@ export default defineContentScript({
       document.getElementById("ft")?.focus();
       return;
     }
-    if (url.includes("wljp/app/search/template")) {
+    if (url.includes("wljp/app/search")) {
       suppressInitialFocus();
       setupHotkeys(WESTLAW_SEARCH_KEY_BINDINGS);
     }

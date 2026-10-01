@@ -6,21 +6,14 @@ import {
 import {
   getYearCode,
   matchTimestamp,
+  normalize,
   parseCaseNumber,
+  SMOOTH_CSV_COL,
   toFullWidth,
-  toHalfWidth,
   type Timestamp,
 } from "@/lib/text-utils";
 import type { HotkeyAction, HotkeyActionWithClipboardText } from "../types";
 import { setSelectBoxValue } from "../ui";
-
-/**
- * 文字列を正規化する
- * （半角化して先頭のクエスチョンマークを削除する）
- */
-const normalize = (s: string): string => {
-  return toHalfWidth(s).replace(/^\?/, "");
-};
 
 /**
  * 入力フィールドをすべてクリアする
@@ -265,13 +258,6 @@ const fillFreewords = (doc: Document, words: string[]): boolean => {
     (id) => (doc.getElementById(id) as HTMLInputElement).value !== "",
   );
 };
-
-const SMOOTH_CSV_COL = {
-  COURT: 4,
-  DATE: 6,
-  DETAIL: 8,
-  CASE_NUMBER: 9,
-} as const;
 
 /**
  * 事件番号調査用のCSVから一括貼り付け
