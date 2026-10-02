@@ -1,7 +1,13 @@
+import { copyString } from "@/lib/copy";
 import { buildKeyString, isEventOnInputableElem } from "@/lib/keystring";
 import { getCurrentClipboardText } from "@/lib/text-utils";
 import { defineContentScript } from "wxt/utils/define-content-script";
 import {
+  copyCaseNumber,
+  copyReference,
+  copyWljpId,
+  getDisplayedCaseNumber,
+  getDisplayedWljpId,
   goSearchHome,
   pasteAndSearch,
   pasteCaseNumber,
@@ -44,17 +50,37 @@ const WESTLAW_SEARCH_KEY_BINDINGS: WestlawKeyBinding[] = [
 const WESTLAW_DETAIL_KEY_BINDINGS: WestlawKeyBinding[] = [
   {
     key: "KeyH",
-    action: (_) => {
+    action: () => {
       goSearchHome();
       return true;
     },
   },
-  // { key: "KeyC", action:  },
-  // { key: "KeyQ", action:  },
-  // { key: "KeyI", action:  },
-  // { key: "C-KeyI", action:  },
-  // { key: "S-KeyI", action:  },
-  // { key: "KeyZ", action:  },
+  { key: "KeyC", action: copyCaseNumber },
+  {
+    key: "KeyI",
+    action: () => {
+      const wid = getDisplayedWljpId();
+      if (wid) {
+        copyString(document, `WestlawJapan ${wid}`);
+        return true;
+      }
+      return false;
+    },
+  },
+  { key: "C-KeyI", action: copyWljpId },
+  {
+    key: "S-KeyI",
+    action: () => {
+      const wid = getDisplayedWljpId();
+      const cn = getDisplayedCaseNumber();
+      if (wid && cn) {
+        copyString(document, `WestlawJapan\t${wid}\t${cn}`);
+        return true;
+      }
+      return false;
+    },
+  },
+  { key: "KeyQ", action: copyReference },
 ];
 
 const handleHotkey = async (pressed: string, bindings: WestlawKeyBinding[]) => {

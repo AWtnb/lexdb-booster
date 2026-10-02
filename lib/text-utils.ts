@@ -24,7 +24,7 @@ export const toHalfWidth = (str: string): string => {
  * （半角化して先頭のクエスチョンマークを削除する）
  */
 export const normalize = (s: string): string => {
-  return toHalfWidth(s).replace(/^\?/, "");
+  return toHalfWidth(s).replace(/^\?/, "").trim();
 };
 
 /**
