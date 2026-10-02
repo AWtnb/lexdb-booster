@@ -200,7 +200,8 @@ const pasteSmoothCsv = (s: string): boolean => {
  * タブ区切りの文字列であれば、SmoothCSVの貼り付け処理を行い、
  * そうでなければ判例文字列の貼り付け処理を行う
  */
-export const pasteAndSearch = (clipboardText: string) => {
+export const pasteAndSearch = (clipboardText: string): boolean => {
+  if (!pressClearButton()) return false;
   const result = (() => {
     if (10 <= clipboardText.split("\t").length) {
       return pasteSmoothCsv(clipboardText);
