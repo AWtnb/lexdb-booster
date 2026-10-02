@@ -100,6 +100,17 @@ const setupHotkeys = (bindings: WestlawKeyBinding[]) => {
   };
 };
 
+const styleupDetailPage = () => {
+  const parent = document.getElementById("related-info-case-summary");
+  if (!parent) return;
+
+  const target = document.getElementById("related-info-case-flash-commentary");
+  if (!target) return;
+  target.style.background = "LemonChiffon";
+
+  parent.insertBefore(target, parent.firstChild);
+};
+
 export default defineContentScript({
   matches: [
     "https://go.westlawjapan.com/wljp/app/doc*",
@@ -117,8 +128,8 @@ export default defineContentScript({
       setupHotkeys(WESTLAW_SEARCH_KEY_BINDINGS);
     }
     if (url.includes("wljp/app/doc")) {
-      suppressInitialFocus();
       setupHotkeys(WESTLAW_DETAIL_KEY_BINDINGS);
+      styleupDetailPage();
     }
   },
 });
