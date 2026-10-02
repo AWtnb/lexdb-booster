@@ -201,7 +201,7 @@ const pasteSmoothCsv = (s: string): boolean => {
  * そうでなければ判例文字列の貼り付け処理を行う
  */
 export const pasteAndSearch = (clipboardText: string): boolean => {
-  if (!pressClearButton()) return false;
+  if (!clearInput()) return false;
   const result = (() => {
     if (10 <= clipboardText.split("\t").length) {
       return pasteSmoothCsv(clipboardText);
@@ -223,12 +223,19 @@ export const pressSubmitButton = (): boolean => {
   return true;
 };
 
-export const pressClearButton = (): boolean => {
-  window.location.href =
-    "https://go.westlawjapan.com/wljp/app/search/template/clear?tid=wljpCasesSearchTemplate";
+export const clearInput = (): boolean => {
+  Array.from(document.getElementsByTagName("input")).forEach((elem) => {
+    if (elem.getAttribute("type") === "text") {
+      elem.value = "";
+    }
+  });
+
+  Array.from(document.getElementsByTagName("select")).forEach((elem) => {
+    elem.selectedIndex = -1;
+  });
+
   return true;
 };
-
 /**
  * 年号コード短縮形（「平」）からフル表記（「平成」）に変換するマップ
  */

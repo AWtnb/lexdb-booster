@@ -3,6 +3,7 @@ import { buildKeyString, isEventOnInputableElem } from "@/lib/keystring";
 import { getCurrentClipboardText } from "@/lib/text-utils";
 import { defineContentScript } from "wxt/utils/define-content-script";
 import {
+  clearInput,
   copyCaseNumber,
   copyReference,
   copyWljpId,
@@ -13,7 +14,6 @@ import {
   pasteCaseNumber,
   pasteDateField,
   pasteWljpId,
-  pressClearButton,
   pressSubmitButton,
 } from "./actions";
 
@@ -43,7 +43,7 @@ const WESTLAW_SEARCH_KEY_BINDINGS: WestlawKeyBinding[] = [
   { key: "KeyL", action: pasteWljpId },
   { key: "A-Enter", action: pressSubmitButton },
   { key: "A-KeyL", action: pressSubmitButton },
-  { key: "A-KeyC", action: pressClearButton },
+  { key: "A-KeyC", action: clearInput },
   { key: "KeyV", action: pasteAndSearch },
 ];
 
