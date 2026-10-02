@@ -100,15 +100,28 @@ const setupHotkeys = (bindings: WestlawKeyBinding[]) => {
   };
 };
 
-const styleupDetailPage = () => {
+const styleUpDetailPage = () => {
   const parent = document.getElementById("related-info-case-summary");
   if (!parent) return;
 
   const target = document.getElementById("related-info-case-flash-commentary");
   if (!target) return;
-  target.style.background = "LemonChiffon";
 
+  if (parent.firstElementChild === target) return;
+
+  target.style.background = "LemonChiffon";
   parent.insertBefore(target, parent.firstChild);
+};
+
+const observeDetailPane = () => {
+  const pane = document.getElementById("docDisplayRightPane");
+  if (!pane) return;
+
+  const observer = new MutationObserver(() => {
+    styleUpDetailPage();
+  });
+
+  observer.observe(pane, { childList: true, subtree: true });
 };
 
 export default defineContentScript({
@@ -129,7 +142,8 @@ export default defineContentScript({
     }
     if (url.includes("wljp/app/doc")) {
       setupHotkeys(WESTLAW_DETAIL_KEY_BINDINGS);
-      styleupDetailPage();
+      styleUpDetailPage();
+      observeDetailPane();
     }
   },
 });
