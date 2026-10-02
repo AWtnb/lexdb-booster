@@ -1,14 +1,38 @@
 import { buildKeyString, isEventOnInputableElem } from "@/lib/keystring";
 import { getSyoshiAnchors, openTopResult } from "../actions/result-page";
-import { getActiveBindings } from "../help";
+import { getActiveBindings, toggleHelpOverlay } from "../help";
 import { isDetailPage, isSearchResultPage } from "../page";
 import { applyDetailPageStyles, applySearchResultPageStyles } from "../styles";
 import type { FrameWindow } from "../types";
-import { focusFrameBody, toggleHelpOverlay } from "../ui";
 import { handleHotkey } from "./hotkey-handler";
 
 const RETRY_INTERVAL_MS = 3000;
 const MAX_RETRIES = 5;
+
+/**
+ * フレーム内のbodyにフォーカスを設定する
+ */
+const focusFrameBody = (
+  frame: HTMLFrameElement,
+  frameDocument: Document | null,
+): void => {
+  try {
+    frame.focus();
+    if (!frameDocument?.body) return;
+
+    frameDocument.body.focus();
+
+    const focusEvent = new FocusEvent("focus", { bubbles: true });
+    frameDocument.body.dispatchEvent(focusEvent);
+
+    const clickEvent = new MouseEvent("click", { bubbles: true });
+    frameDocument.body.dispatchEvent(clickEvent);
+
+    console.log("bodyFrameにフォーカスを設定しました");
+  } catch (focusError) {
+    console.error("フォーカス設定エラー:", focusError);
+  }
+};
 
 /**
  * ホットキー設定関数

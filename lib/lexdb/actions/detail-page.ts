@@ -1,7 +1,7 @@
+import { copyString } from "@/lib/copy";
 import { abbreviateCourtName } from "@/lib/court";
 import { toHalfWidth } from "@/lib/text-utils";
 import type { HotkeyAction } from "../types";
-import { copyString } from "../ui";
 
 /**
  * 事件番号取得処理

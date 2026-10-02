@@ -13,7 +13,6 @@ import {
   type Timestamp,
 } from "@/lib/text-utils";
 import type { HotkeyAction, HotkeyActionWithClipboardText } from "../types";
-import { setSelectBoxValue } from "../ui";
 
 /**
  * 入力フィールドをすべてクリアする
@@ -52,6 +51,20 @@ export const pressSubmitButton: HotkeyAction = ({
     return true;
   }
   return false;
+};
+
+/**
+ * セレクトボックスの値を設定してchangeイベントを発火する
+ */
+const setSelectBoxValue = (
+  doc: Document,
+  elemId: string,
+  value: string,
+): void => {
+  const selectElement = doc.getElementById(elemId) as HTMLSelectElement;
+  selectElement.value = value;
+  const changeEvent = new Event("change", { bubbles: true });
+  selectElement.dispatchEvent(changeEvent);
 };
 
 /**

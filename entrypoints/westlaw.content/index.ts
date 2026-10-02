@@ -55,7 +55,6 @@ const WESTLAW_DETAIL_KEY_BINDINGS: WestlawKeyBinding[] = [
   // { key: "C-KeyI", action:  },
   // { key: "S-KeyI", action:  },
   // { key: "KeyZ", action:  },
-  // 検索結果のn件目を開く
 ];
 
 const handleHotkey = async (pressed: string, bindings: WestlawKeyBinding[]) => {
