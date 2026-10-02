@@ -238,19 +238,24 @@ const YEAR_LABEL_ABBREV_TO_FULL = new Map<string, string>(
 /**
  * 要旨欄の内容を取得する
  * */
-const getDetail = (headElemSelector: string): string => {
-  const span = document.querySelector(headElemSelector);
-  if (!span) return "";
-  const textNode = span.nextSibling;
+const getAnchorHeadDetail = (label: string): string => {
+  const [target] = Array.from(
+    document.querySelectorAll("#anchor-case-head span.cases-head-label"),
+  ).filter((el) => {
+    return el.textContent.trim() == label;
+  });
+  if (!target) return "";
+  const textNode = target.nextSibling;
   if (!textNode) return "";
   return textNode.textContent?.trim() ?? "";
 };
 
 export const getDisplayedCaseNumber = (): string => {
-  return getDetail("#anchor-case-head > div:nth-child(3) .cases-head-label")
+  return getAnchorHeadDetail("事件番号")
     .split("・")
     .map((w) => {
       return w
+        .trim()
         .replaceAll("（", "年（")
         .replaceAll("）", "）第")
         .replace(/^./, (c) => YEAR_LABEL_ABBREV_TO_FULL.get(c) ?? c);
@@ -268,10 +273,7 @@ export const copyCaseNumber = (): boolean => {
   return false;
 };
 
-export const getDisplayedWljpId = (): string =>
-  getDetail(
-    "#anchor-case-head > div:nth-child(5) span.cases-head-label:nth-child(2)",
-  );
+export const getDisplayedWljpId = (): string => getAnchorHeadDetail("文献番号");
 
 export const copyWljpId = (): boolean => {
   const wljpId = getDisplayedWljpId();
@@ -283,9 +285,7 @@ export const copyWljpId = (): boolean => {
 };
 
 const getDisplayedDate = (): string => {
-  const t = getDetail(
-    "#anchor-case-head > div:nth-child(2) span.cases-head-label:nth-child(1)",
-  );
+  const t = getAnchorHeadDetail("裁判年月日");
   return (
     t.slice(0, 1) +
     t
@@ -296,12 +296,8 @@ const getDisplayedDate = (): string => {
 };
 
 export const copyReference = (): boolean => {
-  const courtName = getDetail(
-    "#anchor-case-head > div:nth-child(2) span:nth-child(2) span.cases-head-label",
-  ).replace(/裁$/, "");
-  const category = getDetail(
-    "#anchor-case-head > div:nth-child(2) span:nth-child(3) span.cases-head-label",
-  ).slice(0, 1);
+  const courtName = getAnchorHeadDetail("裁判所名").replace(/裁$/, "");
+  const category = getAnchorHeadDetail("裁判区分").slice(0, 1);
   const timestamp = getDisplayedDate();
   const wid = getDisplayedWljpId();
   if (courtName && category && timestamp && wid) {
