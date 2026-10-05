@@ -1,4 +1,4 @@
-import { defineContentScript } from "wxt/utils/define-content-script";
+import { defineContentScript } from "#imports";
 
 export default defineContentScript({
   matches: [

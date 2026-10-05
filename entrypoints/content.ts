@@ -1,5 +1,5 @@
+import { defineContentScript } from "#imports";
 import { initializeScript } from "@/lib/lexdb/hotkey/hotkey-setup";
-import { defineContentScript } from "wxt/utils/define-content-script";
 
 export default defineContentScript({
   matches: [

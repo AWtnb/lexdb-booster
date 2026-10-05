@@ -1,7 +1,7 @@
+import { defineContentScript } from "#imports";
 import { copyString } from "@/lib/copy";
 import { buildKeyString, isEventOnInputableElem } from "@/lib/keystring";
 import { getCurrentClipboardText } from "@/lib/text-utils";
-import { defineContentScript } from "wxt/utils/define-content-script";
 import {
   clearInput,
   copyCaseNumber,
