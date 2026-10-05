@@ -118,6 +118,7 @@ const fillCaseNumber = (s: string): boolean => {
 };
 
 export const pasteCaseNumber = (clipboardText: string): boolean => {
+  if (!clearInput()) return false;
   if (fillCaseNumber(clipboardText)) {
     return pressSubmitButton();
   }
@@ -130,6 +131,7 @@ const fillFreewords = (freewords: string[]): boolean => {
   el.value = freewords.filter(Boolean).join(" ").trim();
   return 0 < el.value.length;
 };
+
 /**
  * WLJPのIDを取得できればフリーワード欄に入力
  */
@@ -141,6 +143,7 @@ const fillWljpId = (s: string): boolean => {
 };
 
 export const pasteWljpId = (clipboardText: string): boolean => {
+  if (!clearInput()) return false;
   if (fillWljpId(clipboardText)) {
     return pressSubmitButton();
   }
