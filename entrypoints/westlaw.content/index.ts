@@ -1,7 +1,6 @@
 import { defineContentScript } from "#imports";
 import { copyString } from "@/lib/copy";
-import { buildKeyString, isEventOnInputableElem } from "@/lib/keystring";
-import { getCurrentClipboardText } from "@/lib/text-utils";
+import { setupHotkeys, type KeyBinding } from "@/lib/hotkey";
 import {
   clearInput,
   copyCaseNumber,
@@ -30,11 +29,6 @@ const suppressInitialFocus = () => {
   };
 
   ft.addEventListener("focus", onFocus);
-};
-
-type KeyBinding = {
-  key: string;
-  action: (clipboardText: string) => boolean;
 };
 
 const WESTLAW_SEARCH_KEY_BINDINGS: KeyBinding[] = [
@@ -82,22 +76,6 @@ const WESTLAW_DETAIL_KEY_BINDINGS: KeyBinding[] = [
   },
   { key: "KeyQ", action: copyReference },
 ];
-
-const handleHotkey = async (pressed: string, bindings: KeyBinding[]) => {
-  for (const binding of bindings) {
-    if (binding.key !== pressed) continue;
-    const cb = await getCurrentClipboardText();
-    binding.action(cb);
-  }
-};
-
-const setupHotkeys = (bindings: KeyBinding[]) => {
-  document.onkeyup = async (keyEvent) => {
-    if (isEventOnInputableElem(keyEvent)) return;
-    const pressed = buildKeyString(keyEvent);
-    await handleHotkey(pressed, bindings);
-  };
-};
 
 const styleUpDetailPage = () => {
   const parent = document.getElementById("related-info-case-summary");
