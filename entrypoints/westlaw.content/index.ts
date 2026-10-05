@@ -32,12 +32,12 @@ const suppressInitialFocus = () => {
   ft.addEventListener("focus", onFocus);
 };
 
-type WestlawKeyBinding = {
+type KeyBinding = {
   key: string;
   action: (clipboardText: string) => boolean;
 };
 
-const WESTLAW_SEARCH_KEY_BINDINGS: WestlawKeyBinding[] = [
+const WESTLAW_SEARCH_KEY_BINDINGS: KeyBinding[] = [
   { key: "KeyD", action: pasteDateField },
   { key: "KeyN", action: pasteCaseNumber },
   { key: "KeyL", action: pasteWljpId },
@@ -47,7 +47,7 @@ const WESTLAW_SEARCH_KEY_BINDINGS: WestlawKeyBinding[] = [
   { key: "KeyV", action: pasteAndSearch },
 ];
 
-const WESTLAW_DETAIL_KEY_BINDINGS: WestlawKeyBinding[] = [
+const WESTLAW_DETAIL_KEY_BINDINGS: KeyBinding[] = [
   {
     key: "KeyH",
     action: () => {
@@ -83,7 +83,7 @@ const WESTLAW_DETAIL_KEY_BINDINGS: WestlawKeyBinding[] = [
   { key: "KeyQ", action: copyReference },
 ];
 
-const handleHotkey = async (pressed: string, bindings: WestlawKeyBinding[]) => {
+const handleHotkey = async (pressed: string, bindings: KeyBinding[]) => {
   for (const binding of bindings) {
     if (binding.key !== pressed) continue;
     const cb = await getCurrentClipboardText();
@@ -91,9 +91,8 @@ const handleHotkey = async (pressed: string, bindings: WestlawKeyBinding[]) => {
   }
 };
 
-const setupHotkeys = (bindings: WestlawKeyBinding[]) => {
+const setupHotkeys = (bindings: KeyBinding[]) => {
   document.onkeyup = async (keyEvent) => {
-    console.log({ key: keyEvent.key }, { code: keyEvent.code });
     if (isEventOnInputableElem(keyEvent)) return;
     const pressed = buildKeyString(keyEvent);
     await handleHotkey(pressed, bindings);
