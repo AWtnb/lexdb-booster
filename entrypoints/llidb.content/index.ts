@@ -1,11 +1,14 @@
 import { defineContentScript } from "#imports";
 import { setupHotkeys, type KeyBinding } from "@/lib/hotkey";
+import { goHome } from "./actions";
 
 const LLIDB_SEARCH_KEY_BINDINGS: KeyBinding[] = [];
 
 const LLIDB_SEARCH_RESULT_KEY_BINDINGS: KeyBinding[] = [];
 
-const LLIDB_DETAIL_KEY_BINDINGS: KeyBinding[] = [];
+const LLIDB_DETAIL_KEY_BINDINGS: KeyBinding[] = [
+  { key: "KeyH", action: goHome },
+];
 
 export default defineContentScript({
   matches: [
@@ -13,7 +16,6 @@ export default defineContentScript({
     "https://www.legal-info.com/net/search/list",
     "https://www.legal-info.com/net/detail?*",
   ],
-  world: "MAIN",
   main: () => {
     const url = document.location.href;
     if (url.endsWith("search")) {
