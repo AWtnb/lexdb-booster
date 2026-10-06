@@ -123,7 +123,7 @@ const getCaseNumberMatch = (s: string): RegExpExecArray | null => {
       s,
     );
   if (fullMatch) return fullMatch;
-  return /(?<label>明|大|昭|平|令)(?<year>[0-9]{1,2}|元)年?(?<sign>.?\(.{1,3}\))(?<num>[0-9]+)号?/.exec(
+  return /(?<label>明治?|大正?|昭和?|平成?|令和?)(?<year>[0-9]{1,2}|元)年?(?<sign>.?\(.{1,3}\))(?<num>[0-9]+)号?/.exec(
     s,
   );
 };

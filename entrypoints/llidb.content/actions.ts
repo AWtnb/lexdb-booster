@@ -2,11 +2,15 @@ import { copyString } from "@/lib/copy";
 import {
   normalize,
   parseCaseNumber,
+  toHalfWidth,
   YEAR_LABEL_SOURCE,
 } from "@/lib/text-utils";
 
 export const goHome = (): boolean => {
-  const el = document.getElementById("search-form") as HTMLFormElement | null;
+  const wnd = window.top ? window.top : window;
+  const el = wnd.document.getElementById(
+    "search-form",
+  ) as HTMLFormElement | null;
   if (!el) return false;
   el.submit();
   return true;
@@ -90,16 +94,24 @@ export const pasteCaseNumber = (clipboardText: string): boolean => {
   return false;
 };
 
-const getDocFormDataValue = (attr: string): string => {
-  const el = document.getElementById("doc_form");
-  if (!el) return "";
-  const target = el.querySelector(`[${attr}]`);
-  if (!target) return "";
-  return target.getAttribute(attr) ?? "";
+const getDetail = (header: string): string => {
+  const tags = Array.from(document.querySelectorAll(".gaiyou_tag"));
+  for (const tag of tags) {
+    if (tag.textContent.trim() !== header) continue;
+    const el = tag.nextElementSibling;
+    if (el) {
+      return el.textContent.trim();
+    }
+  }
+  return "";
 };
 
 export const getDisplayedCaseNumber = (): string => {
-  return getDocFormDataValue("data-case-number").replace("元年", "１年");
+  const t = getDetail("【事件番号】");
+  if (!t) return "";
+  const [cn] = t.split("／").slice(1);
+  if (!cn) return "";
+  return cn.replace("元年", "１年");
 };
 
 export const copyCaseNumber = (): boolean => {
@@ -112,7 +124,7 @@ export const copyCaseNumber = (): boolean => {
 };
 
 export const getDisplayedLliId = (): string => {
-  return getDocFormDataValue("data-precedent-id");
+  return toHalfWidth(getDetail("【判例番号】"));
 };
 
 export const copyLliId = (): boolean => {

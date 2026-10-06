@@ -26,7 +26,10 @@ const LLIDB_SEARCH_RESULT_KEY_BINDINGS: KeyBinding[] = [
 ];
 
 const LLIDB_DETAIL_KEY_BINDINGS: KeyBinding[] = [
-  { key: "KeyH", action: goHome },
+  {
+    key: "KeyH",
+    action: goHome,
+  },
   { key: "KeyC", action: copyCaseNumber },
   {
     key: "KeyI",
@@ -60,7 +63,9 @@ export default defineContentScript({
     "https://www.legal-info.com/net/search",
     "https://www.legal-info.com/net/search/list",
     "https://www.legal-info.com/net/detail?*",
+    "https://www.legal-info.com/detail/get_file?*",
   ],
+  allFrames: true,
   main: () => {
     const url = document.location.href;
     if (url.endsWith("search")) {
@@ -70,6 +75,23 @@ export default defineContentScript({
     if (url.endsWith("search/list")) {
       setupHotkeys(LLIDB_SEARCH_RESULT_KEY_BINDINGS);
       return;
+    }
+
+    if (window === window.top) {
+      const docFrame = document.getElementById(
+        "doc_frame",
+      ) as HTMLIFrameElement | null;
+      if (docFrame?.contentWindow) {
+        docFrame.contentWindow.focus();
+      } else {
+        docFrame?.addEventListener(
+          "load",
+          () => {
+            docFrame.contentWindow?.focus();
+          },
+          { once: true },
+        );
+      }
     }
     setupHotkeys(LLIDB_DETAIL_KEY_BINDINGS);
   },
