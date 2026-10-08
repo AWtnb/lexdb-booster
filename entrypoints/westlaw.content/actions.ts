@@ -239,6 +239,7 @@ export const clearInput = (): boolean => {
 
   return true;
 };
+
 /**
  * 年号コード短縮形（「平」）からフル表記（「平成」）に変換するマップ
  */
