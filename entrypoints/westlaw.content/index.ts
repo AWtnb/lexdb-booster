@@ -86,7 +86,7 @@ const styleUpDetailPage = () => {
 
   if (parent.firstElementChild === target) return;
 
-  target.style.background = "LemonChiffon";
+  target.style.background = "gold";
   parent.insertBefore(target, parent.firstChild);
 };
 

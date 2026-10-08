@@ -2,28 +2,34 @@ import { defineContentScript } from "#imports";
 import { copyString } from "@/lib/copy";
 import { setupHotkeys, type KeyBinding } from "@/lib/hotkey";
 import {
+  clearInput,
   copyCaseNumber,
   copyLliId,
   copyReference,
   getDisplayedCaseNumber,
   getDisplayedLliId,
   goHome,
+  pasteAndSearch,
   pasteCaseNumber,
+  pasteDateField,
   pasteLliId,
-  pressClearButton,
   pressSubmitButton,
+  styleUpSource,
 } from "./actions";
 
 const LLIDB_SEARCH_KEY_BINDINGS: KeyBinding[] = [
   { key: "A-KeyL", action: pressSubmitButton },
   { key: "A-Enter", action: pressSubmitButton },
-  { key: "A-KeyC", action: pressClearButton },
+  { key: "A-KeyC", action: clearInput },
   { key: "KeyL", action: pasteLliId },
   { key: "KeyN", action: pasteCaseNumber },
+  { key: "KeyD", action: pasteDateField },
+  { key: "KeyV", action: pasteAndSearch },
 ];
 
 const LLIDB_SEARCH_RESULT_KEY_BINDINGS: KeyBinding[] = [
   { key: "KeyH", action: goHome },
+  // TODO: enter,1,2,3,,4,5,...
 ];
 
 const LLIDB_DETAIL_KEY_BINDINGS: KeyBinding[] = [
@@ -84,7 +90,7 @@ export default defineContentScript({
       setupHotkeys(LLIDB_SEARCH_RESULT_KEY_BINDINGS);
       return;
     }
-
+    styleUpSource();
     setupHotkeys(LLIDB_DETAIL_KEY_BINDINGS);
   },
 });
