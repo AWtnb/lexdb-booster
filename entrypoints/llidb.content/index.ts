@@ -77,22 +77,6 @@ export default defineContentScript({
       return;
     }
 
-    if (window === window.top) {
-      const docFrame = document.getElementById(
-        "doc_frame",
-      ) as HTMLIFrameElement | null;
-      if (docFrame?.contentWindow) {
-        docFrame.contentWindow.focus();
-      } else {
-        docFrame?.addEventListener(
-          "load",
-          () => {
-            docFrame.contentWindow?.focus();
-          },
-          { once: true },
-        );
-      }
-    }
     setupHotkeys(LLIDB_DETAIL_KEY_BINDINGS);
   },
 });

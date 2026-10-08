@@ -7,7 +7,7 @@ import {
 } from "@/lib/text-utils";
 
 export const goHome = (): boolean => {
-  const wnd = window.top ? window.top : window;
+  const wnd = window.top ?? window;
   const el = wnd.document.getElementById(
     "search-form",
   ) as HTMLFormElement | null;
@@ -94,8 +94,23 @@ export const pasteCaseNumber = (clipboardText: string): boolean => {
   return false;
 };
 
+/**
+ * 詳細ページでiframeで挿入されたdocumentを取得する
+ */
+const getFrameDocument = (): Document | null => {
+  if (window !== window.top) {
+    return window.document;
+  }
+  const docFrame = document.getElementById(
+    "doc_frame",
+  ) as HTMLIFrameElement | null;
+  return docFrame?.contentWindow?.document ?? null;
+};
+
 const getDetail = (header: string): string => {
-  const tags = Array.from(document.querySelectorAll(".gaiyou_tag"));
+  const doc = getFrameDocument();
+  if (!doc) return "";
+  const tags = Array.from(doc.querySelectorAll(".gaiyou_tag"));
   for (const tag of tags) {
     if (tag.textContent.trim() !== header) continue;
     const el = tag.nextElementSibling;
