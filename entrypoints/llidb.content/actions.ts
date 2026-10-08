@@ -168,7 +168,12 @@ export const getDisplayedCaseNumber = (): string => {
   const t = getDetail("【事件番号】");
   if (!t) return "";
   const [cn] = t.split("／").slice(1);
-  if (!cn) return "";
+
+  if (!cn) {
+    const lid = getDisplayedLliId();
+    if (!lid) return "";
+    return `事件番号なし（LLI/DB ${lid}）`;
+  }
   return cn.replace("元年", "１年");
 };
 
