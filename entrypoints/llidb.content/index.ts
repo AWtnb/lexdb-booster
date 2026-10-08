@@ -31,6 +31,13 @@ const LLIDB_DETAIL_KEY_BINDINGS: KeyBinding[] = [
     key: "KeyH",
     action: goHome,
   },
+  {
+    key: "KeyR",
+    action: () => {
+      history.back();
+      return true;
+    },
+  },
   { key: "KeyC", action: copyCaseNumber },
   {
     key: "KeyI",
