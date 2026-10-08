@@ -23,7 +23,7 @@ export const toHalfWidth = (str: string): string => {
  * 文字列を正規化する
  * （半角化して先頭のクエスチョンマークを削除する）
  */
-export const normalize = (s: string): string => {
+export const sanitizeString = (s: string): string => {
   return toHalfWidth(s).replace(/^\?/, "").trim();
 };
 
@@ -152,7 +152,7 @@ export const parseCaseNumber = (
 
 /** 出典の詳細欄を整形する */
 export const formatDetail = (detail: string): string => {
-  let fmt = normalize(detail);
+  let fmt = sanitizeString(detail);
 
   // 文字列から最初の連続数字もしくは「（昭58）号145頁」（高刑速報の出典）以降を抽出
   const m = fmt.match(/(\([明大昭平令])?[0-9]+/);

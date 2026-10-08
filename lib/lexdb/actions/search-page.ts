@@ -7,8 +7,8 @@ import {
   formatDetail,
   getYearCode,
   matchTimestamp,
-  normalize,
   parseCaseNumber,
+  sanitizeString,
   SMOOTH_CSV_COL,
   type Timestamp,
 } from "@/lib/text-utils";
@@ -71,7 +71,7 @@ const setSelectBoxValue = (
  * 事件番号欄を埋める
  */
 const fillCaseNumber = (doc: Document, s: string): boolean => {
-  const caseNumber = parseCaseNumber(normalize(s));
+  const caseNumber = parseCaseNumber(sanitizeString(s));
   if (!caseNumber) return false;
   const { code, year, sign, num } = caseNumber;
 
@@ -106,7 +106,7 @@ export const pasteCaseNumber: HotkeyActionWithClipboardText = (
  * 入力成功した場合、Timestamp オブジェクトを返す。
  */
 const fillDateFields = (doc: Document, s: string): Timestamp | null => {
-  const timestamp = matchTimestamp(normalize(s));
+  const timestamp = matchTimestamp(sanitizeString(s));
   if (!timestamp) return null;
 
   (
@@ -209,7 +209,7 @@ export const cycleFreeWord: HotkeyAction = ({ bodyDocument }): boolean => {
  * LEX文献番号欄を埋める処理
  */
 const fillLexId = (doc: Document, s: string): boolean => {
-  const m = normalize(s).match(/\d{8}/);
+  const m = sanitizeString(s).match(/\d{8}/);
   if (!m) return false;
   const lexId = m[0];
   (
@@ -258,7 +258,7 @@ const fillFreewords = (doc: Document, words: string[]): boolean => {
  * SmoothCSVからのコピーを前提に、列はタブ区切りで扱う
  */
 const pasteSmoothCsv = (doc: Document, cb: string): boolean => {
-  const fields = cb.split("\t").map(normalize);
+  const fields = cb.split("\t").map(sanitizeString);
   const court = fields[SMOOTH_CSV_COL.COURT]!;
   const date = fields[SMOOTH_CSV_COL.DATE]!;
   const detail = fields[SMOOTH_CSV_COL.DETAIL]!;
@@ -287,7 +287,7 @@ const pasteSmoothCsv = (doc: Document, cb: string): boolean => {
  * 例：「札幌地判令和3・3・17判時2487号3頁」
  */
 const pastePrecedent = (doc: Document, cb: string): boolean => {
-  const s = normalize(cb.replace(/\s/g, "").replace(/[\r\n]+/g, ""));
+  const s = sanitizeString(cb.replace(/\s/g, "").replace(/[\r\n]+/g, ""));
   if (fillLexId(doc, s)) {
     return true;
   }

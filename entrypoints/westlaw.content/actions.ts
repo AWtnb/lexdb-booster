@@ -6,8 +6,8 @@ import {
 } from "@/lib/court";
 import {
   matchTimestamp,
-  normalize,
   parseCaseNumber,
+  sanitizeString,
   SMOOTH_CSV_COL,
   YEAR_LABEL_SOURCE,
   type Timestamp,
@@ -40,7 +40,7 @@ const setSelectValue = (
  * 日付欄を埋める
  */
 const fillDateFields = (s: string): Timestamp | null => {
-  const timestamp = matchTimestamp(normalize(s));
+  const timestamp = matchTimestamp(sanitizeString(s));
   if (!timestamp) return null;
 
   const yearValue = YEAR_LABEL_VAR_MAP.get(timestamp.date.label.slice(0, 1));
@@ -78,7 +78,7 @@ const YEAR_CODE_TO_LABEL_ABBREV = new Map<string, string>(
  * 事件番号欄を埋める
  */
 const fillCaseNumber = (s: string): boolean => {
-  const caseNumber = parseCaseNumber(normalize(s));
+  const caseNumber = parseCaseNumber(sanitizeString(s));
   if (!caseNumber) return false;
 
   // 1. 元号をセット
@@ -136,7 +136,7 @@ const fillFreewords = (freewords: string[]): boolean => {
  * WLJPのIDを取得できればフリーワード欄に入力
  */
 const fillWljpId = (s: string): boolean => {
-  const m = /[0-9]{4}WLJPCA[0-9]{8}/.exec(normalize(s));
+  const m = /[0-9]{4}WLJPCA[0-9]{8}/.exec(sanitizeString(s));
   if (!m) return false;
   const [t] = m;
   return fillFreewords([t]);
@@ -176,7 +176,7 @@ const pastePrecedent = (s: string): boolean => {
  * SmoothCSVからのコピーを前提に、列はタブ区切りで扱う
  */
 const pasteSmoothCsv = (s: string): boolean => {
-  const fields = s.split("\t").map(normalize);
+  const fields = s.split("\t").map(sanitizeString);
   const court = fields[SMOOTH_CSV_COL.COURT]!;
   const date = fields[SMOOTH_CSV_COL.DATE]!;
   const detail = fields[SMOOTH_CSV_COL.DETAIL]!;
