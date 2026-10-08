@@ -1,7 +1,7 @@
 import { copyString } from "@/lib/copy";
 import {
-  normalize,
   parseCaseNumber,
+  sanitizeString,
   toHalfWidth,
   YEAR_LABEL_SOURCE,
 } from "@/lib/text-utils";
@@ -34,7 +34,7 @@ const fillLliId = (s: string): boolean => {
   const [el] = document.getElementsByName("LIC_NO");
   if (!el) return false;
 
-  const m = /L[0-9]{8}/.exec(normalize(s));
+  const m = /L[0-9]{8}/.exec(sanitizeString(s));
   if (!m) return false;
   const [t] = m;
 
@@ -58,7 +58,7 @@ const YEAR_CODE_TO_LABEL_ALPHABET = new Map<string, string>(
 );
 
 const fillCaseNumber = (s: string): boolean => {
-  const caseNumber = parseCaseNumber(normalize(s));
+  const caseNumber = parseCaseNumber(sanitizeString(s));
   if (!caseNumber) return false;
 
   // 1. 元号をセット
@@ -130,9 +130,11 @@ export const getDisplayedCaseNumber = (): string => {
 };
 
 export const copyCaseNumber = (): boolean => {
+  const doc = getFrameDocument();
+  if (!doc) return false;
   const c = getDisplayedCaseNumber();
   if (c) {
-    copyString(document, c);
+    copyString(doc, c);
     return true;
   }
   return false;
@@ -143,10 +145,73 @@ export const getDisplayedLliId = (): string => {
 };
 
 export const copyLliId = (): boolean => {
+  const doc = getFrameDocument();
+  if (!doc) return false;
   const lid = getDisplayedLliId();
   if (lid) {
-    copyString(document, lid);
+    copyString(doc, lid);
     return true;
   }
   return false;
+};
+
+const extractCategory = (base: string, after: string): string | null => {
+  const i = base.indexOf(after);
+  if (i < 0) return null;
+  const [category] = base.slice(i + after.length).slice(0, 1);
+  return category ?? null;
+};
+
+const parseCourtDecision = (
+  s: string,
+): { abbrev: string | null; category: string | null } => {
+  if (s.includes("最高裁判所")) {
+    const mapping = new Map<string, string>([
+      ["大法廷", "最大"],
+      ["第１小法廷", "最一小"],
+      ["第２小法廷", "最二小"],
+      ["第３小法廷", "最三小"],
+    ]);
+    for (const [phrase, abbrev] of mapping) {
+      if (s.includes(phrase)) {
+        return {
+          abbrev,
+          category: extractCategory(s, phrase),
+        };
+      }
+    }
+    return { abbrev: "最", category: extractCategory(s, "最高裁判所") };
+  }
+  const phrases = ["高等裁判所", "家庭裁判所", "地方裁判所"];
+  for (const phrase of phrases) {
+    if (!s.includes(phrase)) continue;
+    const [prefix, suffix] = s.split(phrase);
+    if (!prefix || !suffix) continue;
+    let abbrev = prefix + phrase.slice(0, 1);
+    const i = suffix.indexOf("支部");
+    if (i !== -1) {
+      abbrev = abbrev + suffix.slice(0, i + 1);
+      return { abbrev, category: extractCategory(s, "支部") };
+    }
+    return { abbrev, category: extractCategory(s, phrase) };
+  }
+  return { abbrev: null, category: null };
+};
+
+export const copyReference = (): boolean => {
+  const [decision] = getDetail("【事件番号】").split("／");
+  if (!decision) return false;
+  const { abbrev, category } = parseCourtDecision(decision);
+  if (!abbrev || !category) return false;
+  const timestamp = toHalfWidth(getDetail("【判決日付】"))
+    .replace(/[年月]/g, ".")
+    .replace("日", "")
+    .replace(/^(.)./, "$1");
+  const lid = getDisplayedLliId();
+  if (!lid) return false;
+  const ref = `${abbrev}${category}${timestamp} LLI/DB ${lid}`;
+  const doc = getFrameDocument();
+  if (!doc) return false;
+  copyString(doc, ref);
+  return true;
 };

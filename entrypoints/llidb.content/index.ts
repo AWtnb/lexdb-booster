@@ -4,6 +4,7 @@ import { setupHotkeys, type KeyBinding } from "@/lib/hotkey";
 import {
   copyCaseNumber,
   copyLliId,
+  copyReference,
   getDisplayedCaseNumber,
   getDisplayedLliId,
   goHome,
@@ -55,7 +56,7 @@ const LLIDB_DETAIL_KEY_BINDINGS: KeyBinding[] = [
       return false;
     },
   },
-  // { key: "KeyQ", action: copyReference },
+  { key: "KeyQ", action: copyReference },
 ];
 
 export default defineContentScript({
