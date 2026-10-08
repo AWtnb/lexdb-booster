@@ -5,6 +5,7 @@ import {
   formatCourtName,
 } from "@/lib/court";
 import {
+  formatDetail,
   matchTimestamp,
   parseCaseNumber,
   sanitizeString,
@@ -337,6 +338,11 @@ const pastePrecedent = (s: string): boolean => {
 
   const courtName = deriveLeadingCourtName(s);
   if (courtName) freewords.push(formatCourtName(courtName));
+
+  if (!caseNumberFillResult && filledTimestamp) {
+    const detail = s.slice(filledTimestamp.end);
+    freewords.push(formatDetail(detail));
+  }
   const freewordFillResult = fillFreewords(freewords);
 
   return caseNumberFillResult || filledTimestamp !== null || freewordFillResult;
@@ -364,6 +370,7 @@ const pasteSmoothCsv = (s: string): boolean => {
   const freewords = [];
   const courtExpanded = expandCourtAbbrev(court);
   if (courtExpanded) freewords.push(formatCourtName(courtExpanded));
+  freewords.push(formatDetail(detail));
 
   const dateFillResult = fillDateFields(date) !== null;
   const freewordFillResult = fillFreewords(freewords);

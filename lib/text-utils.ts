@@ -154,6 +154,8 @@ export const parseCaseNumber = (
 export const formatDetail = (detail: string): string => {
   let fmt = sanitizeString(detail);
 
+  fmt = fmt.replace("（参）", "").replace("〔参〕", "");
+
   // 文字列から最初の連続数字もしくは「（昭58）号145頁」（高刑速報の出典）以降を抽出
   const m = fmt.match(/(\([明大昭平令])?[0-9]+/);
   if (!m) return "";
