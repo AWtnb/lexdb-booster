@@ -252,6 +252,37 @@ const fillFreewords = (doc: Document, words: string[]): boolean => {
   );
 };
 
+const setCourtCheckBox = (doc: Document, courtName: string) => {
+  if (courtName.startsWith("最高")) {
+    (
+      doc.getElementById(
+        "InputCourt_Control_CourtCheckBox0",
+      ) as HTMLInputElement
+    ).checked = true;
+  }
+  if (courtName.endsWith("高等裁判所")) {
+    (
+      doc.getElementById(
+        "InputCourt_Control_CourtCheckBox1",
+      ) as HTMLInputElement
+    ).checked = true;
+  }
+  if (courtName.endsWith("地方裁判所")) {
+    (
+      doc.getElementById(
+        "InputCourt_Control_CourtCheckBox2",
+      ) as HTMLInputElement
+    ).checked = true;
+  }
+  if (courtName.endsWith("家庭裁判所")) {
+    (
+      doc.getElementById(
+        "InputCourt_Control_CourtCheckBox3",
+      ) as HTMLInputElement
+    ).checked = true;
+  }
+};
+
 /**
  * 事件番号調査用のCSVから一括貼り付け
  * SmoothCSVからのコピーを前提に、列はタブ区切りで扱う
@@ -273,7 +304,10 @@ const pasteSmoothCsv = (doc: Document, cb: string): boolean => {
 
   const freewords = [];
   const courtExpanded = expandCourtAbbrev(court);
-  if (courtExpanded) freewords.push(formatCourtName(courtExpanded));
+  if (courtExpanded) {
+    freewords.push(formatCourtName(courtExpanded));
+    setCourtCheckBox(doc, courtExpanded);
+  }
   freewords.push(formatDetail(detail));
 
   const dateFillResult = fillDateFields(doc, date) !== null;
@@ -297,7 +331,10 @@ const pastePrecedent = (doc: Document, cb: string): boolean => {
   const freewords = [];
 
   const courtName = deriveLeadingCourtName(s);
-  if (courtName) freewords.push(formatCourtName(courtName));
+  if (courtName) {
+    freewords.push(formatCourtName(courtName));
+    setCourtCheckBox(doc, courtName);
+  }
 
   if (!caseNumberFillResult && filledTimestamp) {
     const detail = s.slice(filledTimestamp.end);
