@@ -147,7 +147,7 @@ const fillDateFields = (s: string): Timestamp | null => {
 export const pasteDateField = (clipboardText: string): boolean =>
   fillDateFields(clipboardText) !== null;
 
-const fillFreewords = (freewords: string[]): boolean => {
+const fillFreeword = (freewords: string[]): boolean => {
   const el = document.getElementById("hanSearchFreeWord1_input");
   if (!el) return false;
   const q = freewords.join(" ");
@@ -155,10 +155,17 @@ const fillFreewords = (freewords: string[]): boolean => {
   return 0 < q.trim().length;
 };
 
+export const focusFreeword = (): boolean => {
+  const el = document.getElementById("hanSearchFreeWord1_input");
+  if (!el) return false;
+  (el as HTMLInputElement).select();
+  return true;
+};
+
 const fillD1LawId = (s: string): boolean => {
   const m = /[0-9]{8}/.exec(sanitizeString(s));
   if (!m) return false;
-  return fillFreewords(m);
+  return fillFreeword(m);
 };
 
 export const pasteD1LawId = (clipboardText: string): boolean => {
@@ -185,7 +192,7 @@ const pastePrecedent = (s: string): boolean => {
   const courtName = deriveLeadingCourtName(s);
   if (courtName) freewords.push(formatCourtName(courtName));
 
-  const freewordFillResult = fillFreewords(freewords);
+  const freewordFillResult = fillFreeword(freewords);
 
   return caseNumberFillResult || filledTimestamp !== null || freewordFillResult;
 };
@@ -214,7 +221,7 @@ const pasteSmoothCsv = (s: string): boolean => {
   if (courtExpanded) freewords.push(formatCourtName(courtExpanded));
 
   const dateFillResult = fillDateFields(date) !== null;
-  const freewordFillResult = fillFreewords(freewords);
+  const freewordFillResult = fillFreeword(freewords);
   return dateFillResult || freewordFillResult;
 };
 

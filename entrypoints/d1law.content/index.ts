@@ -3,6 +3,7 @@ import { setupHotkeys, type KeyBinding } from "@/lib/hotkey";
 import { defineContentScript } from "#imports";
 import {
   closeAlertMessage,
+  focusFreeword,
   pasteAndSearch,
   pasteCaseNumber,
   pasteD1LawId,
@@ -21,6 +22,7 @@ const D1LAW_SEARCH_KEY_BINDINGS: KeyBinding[] = [
   { key: "KeyD", action: pasteDateField },
   { key: "KeyL", action: pasteD1LawId },
   { key: "KeyV", action: pasteAndSearch },
+  { key: "KeyF", action: focusFreeword },
 ];
 
 const setupObserver = () => {
