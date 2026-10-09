@@ -3,7 +3,10 @@ import { setupHotkeys, type KeyBinding } from "@/lib/hotkey";
 import { defineContentScript } from "#imports";
 import {
   closeAlertMessage,
+  pasteAndSearch,
   pasteCaseNumber,
+  pasteD1LawId,
+  pasteDateField,
   pressClearButton,
   pressSubmitButton,
 } from "./actions";
@@ -15,6 +18,9 @@ const D1LAW_SEARCH_KEY_BINDINGS: KeyBinding[] = [
   { key: "A-KeyL", action: pressSubmitButton },
   { key: "A-Enter", action: pressSubmitButton },
   { key: "KeyN", action: pasteCaseNumber },
+  { key: "KeyD", action: pasteDateField },
+  { key: "KeyL", action: pasteD1LawId },
+  { key: "KeyV", action: pasteAndSearch },
 ];
 
 const setupObserver = () => {

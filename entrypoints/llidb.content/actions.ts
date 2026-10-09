@@ -275,16 +275,19 @@ const fillDateFields = (s: string): Timestamp | null => {
   labelEl.value = yearLabelValue;
 
   // 2. 年をセット
-  const yearEl = document.getElementsByName("T12")[0] as HTMLInputElement;
-  yearEl.value = String(timestamp.date.year);
+  const [yearEl] = document.getElementsByName("T12");
+  if (!yearEl) return null;
+  (yearEl as HTMLInputElement).value = String(timestamp.date.year);
 
   // 3. 月をセット
-  const monthEl = document.getElementsByName("T13")[0] as HTMLInputElement;
-  monthEl.value = String(timestamp.date.month);
+  const [monthEl] = document.getElementsByName("T13");
+  if (!monthEl) return null;
+  (monthEl as HTMLInputElement).value = String(timestamp.date.month);
 
   // 4. 日をセット
-  const dayEl = document.getElementsByName("T14")[0] as HTMLInputElement;
-  dayEl.value = String(timestamp.date.day);
+  const [dayEl] = document.getElementsByName("T14");
+  if (!dayEl) return null;
+  (dayEl as HTMLInputElement).value = String(timestamp.date.day);
 
   return timestamp;
 };

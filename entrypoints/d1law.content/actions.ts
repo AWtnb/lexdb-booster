@@ -1,8 +1,14 @@
 import { copyString } from "@/lib/copy";
 import {
+  deriveLeadingCourtName,
+  expandCourtAbbrev,
+  formatCourtName,
+} from "@/lib/court";
+import {
   matchTimestamp,
   parseCaseNumber,
   sanitizeString,
+  SMOOTH_CSV_COL,
   type Timestamp,
 } from "@/lib/text-utils";
 
@@ -120,19 +126,109 @@ const fillDateFields = (s: string): Timestamp | null => {
   (labelEl as HTMLSelectElement).value = timestamp.date.yearLabel.code;
 
   // 2. 年をセット
-  const yearEl = document.getElementsByName("T12")[0] as HTMLInputElement;
-  yearEl.value = String(timestamp.date.year);
+  const [yearEl] = document.getElementsByName("judgementDateFromY");
+  if (!yearEl) return null;
+  (yearEl as HTMLInputElement).value = String(timestamp.date.year);
 
   // 3. 月をセット
-  const monthEl = document.getElementsByName("T13")[0] as HTMLInputElement;
-  monthEl.value = String(timestamp.date.month);
+  const [monthEl] = document.getElementsByName("judgementDateFromM");
+  if (!monthEl) return null;
+  (monthEl as HTMLInputElement).value = String(timestamp.date.month);
 
   // 4. 日をセット
-  const dayEl = document.getElementsByName("T14")[0] as HTMLInputElement;
-  dayEl.value = String(timestamp.date.day);
+  const [dayEl] = document.getElementsByName("judgementDateFromD");
+  if (!dayEl) return null;
+  (dayEl as HTMLInputElement).value = String(timestamp.date.day);
 
   return timestamp;
 };
 
 export const pasteDateField = (clipboardText: string): boolean =>
   fillDateFields(clipboardText) !== null;
+
+const fillFreewords = (freewords: string[]): boolean => {
+  const el = document.getElementById("hanSearchFreeWord1_input");
+  if (!el) return false;
+  const q = freewords.join(" ");
+  (el as HTMLInputElement).value = q;
+  return 0 < q.trim().length;
+};
+
+const fillD1LawId = (s: string): boolean => {
+  const m = /[0-9]{8}/.exec(sanitizeString(s));
+  if (!m) return false;
+  return fillFreewords(m);
+};
+
+export const pasteD1LawId = (clipboardText: string): boolean => {
+  if (!pressClearButton()) return false;
+  if (fillD1LawId(clipboardText)) {
+    return pressSubmitButton();
+  }
+  return false;
+};
+
+/**
+ * 判例文字列からの貼り付け
+ * 例：「札幌地判令和3・3・17判時2487号3頁」
+ */
+const pastePrecedent = (s: string): boolean => {
+  if (fillD1LawId(s)) {
+    return true;
+  }
+  const caseNumberFillResult = fillCaseNumber(s);
+  const filledTimestamp = fillDateFields(s);
+
+  const freewords = [];
+
+  const courtName = deriveLeadingCourtName(s);
+  if (courtName) freewords.push(formatCourtName(courtName));
+
+  const freewordFillResult = fillFreewords(freewords);
+
+  return caseNumberFillResult || filledTimestamp !== null || freewordFillResult;
+};
+
+/**
+ * 事件番号調査用のCSVから一括貼り付け
+ * SmoothCSVからのコピーを前提に、列はタブ区切りで扱う
+ */
+const pasteSmoothCsv = (s: string): boolean => {
+  const fields = s.split("\t").map(sanitizeString);
+  const court = fields[SMOOTH_CSV_COL.COURT]!;
+  const date = fields[SMOOTH_CSV_COL.DATE]!;
+  const detail = fields[SMOOTH_CSV_COL.DETAIL]!;
+  const casenumber = fields[SMOOTH_CSV_COL.CASE_NUMBER]!;
+
+  if (fillD1LawId(detail)) {
+    return true;
+  }
+
+  if (fillCaseNumber(casenumber)) {
+    return true;
+  }
+
+  const freewords = [];
+  const courtExpanded = expandCourtAbbrev(court);
+  if (courtExpanded) freewords.push(formatCourtName(courtExpanded));
+
+  const dateFillResult = fillDateFields(date) !== null;
+  const freewordFillResult = fillFreewords(freewords);
+  return dateFillResult || freewordFillResult;
+};
+
+/**
+ * タブ区切りの文字列であれば、SmoothCSVの貼り付け処理を行い、
+ * そうでなければ判例文字列の貼り付け処理を行う
+ */
+export const pasteAndSearch = (clipboardText: string): boolean => {
+  if (!pressClearButton()) return false;
+  const result = (() => {
+    if (10 <= clipboardText.split("\t").length) {
+      return pasteSmoothCsv(clipboardText);
+    }
+    return pastePrecedent(clipboardText);
+  })();
+  if (!result) return false;
+  return pressSubmitButton();
+};
