@@ -29,7 +29,6 @@ const LLIDB_SEARCH_KEY_BINDINGS: KeyBinding[] = [
 
 const LLIDB_SEARCH_RESULT_KEY_BINDINGS: KeyBinding[] = [
   { key: "KeyH", action: goHome },
-  // TODO: enter,1,2,3,,4,5,...
 ];
 
 const LLIDB_DETAIL_KEY_BINDINGS: KeyBinding[] = [
@@ -86,7 +85,12 @@ export default defineContentScript({
       setupHotkeys(LLIDB_SEARCH_KEY_BINDINGS);
       return;
     }
-    if (url.endsWith("search/list")) {
+    if (url.includes("search/list")) {
+      const results = document.querySelectorAll("a.list_link[data-id]");
+      if (results && results.length === 1) {
+        (results[0]! as HTMLAnchorElement).focus();
+        return;
+      }
       setupHotkeys(LLIDB_SEARCH_RESULT_KEY_BINDINGS);
       return;
     }
