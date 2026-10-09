@@ -24,7 +24,7 @@ export const toHalfWidth = (str: string): string => {
  * （半角化して先頭のクエスチョンマークを削除する）
  */
 export const sanitizeString = (s: string): string => {
-  return toHalfWidth(s).replace(/^\?/, "").trim();
+  return toHalfWidth(s).replace(/^\?/, "").replace(/[ 　]/g, "").trim();
 };
 
 /**
@@ -161,7 +161,8 @@ export const parseCaseNumber = (
   sign: string;
   num: number;
 } | null => {
-  const m = getCaseNumberMatch(toHalfWidth(str));
+  const m = getCaseNumberMatch(sanitizeString(str));
+  console.log(sanitizeString(str));
   if (!m) return null;
   const { label, year, sign, num } = m.groups!;
   if (!label || !year || !sign || !num) return null;
