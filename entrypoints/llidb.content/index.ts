@@ -16,6 +16,7 @@ import {
   pressSubmitButton,
   styleUpSource,
 } from "./actions";
+import { handleSearchResult } from "./result-page";
 
 const LLIDB_SEARCH_KEY_BINDINGS: KeyBinding[] = [
   { key: "A-KeyL", action: pressSubmitButton },
@@ -86,9 +87,7 @@ export default defineContentScript({
       return;
     }
     if (url.includes("search/list")) {
-      const results = document.querySelectorAll("a.list_link[data-id]");
-      if (results && results.length === 1) {
-        (results[0]! as HTMLAnchorElement).focus();
+      if (handleSearchResult()) {
         return;
       }
       setupHotkeys(LLIDB_SEARCH_RESULT_KEY_BINDINGS);
