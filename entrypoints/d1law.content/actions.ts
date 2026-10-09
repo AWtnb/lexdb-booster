@@ -234,6 +234,42 @@ export const pasteAndSearch = (clipboardText: string): boolean => {
   return pressSubmitButton();
 };
 
+const parseGreatCourtAbbrev = (base: string): string | null => {
+  const detail = getDetail("裁判年月日等");
+  if (!detail) return null;
+  const parts = toHalfWidth(detail).split("/");
+  const i = parts.indexOf("大審院");
+  if (i === -1) return null;
+  const branchCandidate = parts[i + 1];
+  if (!branchCandidate) return null;
+  const categoryAbbrev = base.slice(3, 4);
+  if (branchCandidate.startsWith(categoryAbbrev)) return null;
+
+  const mapping = new Map([
+    ["連合部", "大連"],
+    ["民事総連合部", "大民連"],
+    ["第1民事部", "大一民"],
+    ["第2民事部", "大二民"],
+    ["第3民事部", "大三民"],
+    ["第4民事部", "大四民"],
+    ["第5民事部", "大五民"],
+    ["第1第2第3刑事総連合部", "大一－三刑連"],
+    ["第1第2第3第4刑事総連合部", "大一－四刑連"],
+    ["刑事総連合部", "大刑連"],
+    ["第1刑事部", "大一刑"],
+    ["第2刑事部", "大二刑"],
+    ["第3刑事部", "大三刑"],
+    ["第4刑事部", "大四刑"],
+    ["刑事部附帯私訴", "大刑"],
+    ["第5刑事部", "大五刑"],
+    ["第六刑事部", "大六刑"],
+    ["民事刑事総連合部", "大民刑総連"],
+    ["民事刑事連合部", "大民刑連"],
+    ["休暇部", "大休暇部"],
+  ]);
+  return mapping.get(branchCandidate) ?? null;
+};
+
 export const copyReference = (): boolean => {
   const [pageTitle] = document.getElementsByTagName("title");
   if (!pageTitle) return false;
@@ -246,7 +282,7 @@ export const copyReference = (): boolean => {
     base = "最" + base.slice(2);
   }
   if (base.startsWith("大審院")) {
-    base = "大" + base.slice(3);
+    base = (parseGreatCourtAbbrev(base) ?? "大") + base.slice(3);
   }
   copyString(document, base);
   return true;
