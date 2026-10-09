@@ -3,6 +3,7 @@ import { setupHotkeys, type KeyBinding } from "@/lib/hotkey";
 import {
   copyCaseNumber,
   copyD1LawId,
+  copyReference,
   getDisplayedCaseNumber,
   getDisplayedD1LawId,
 } from "./actions";
@@ -46,6 +47,7 @@ const D1LAW_DETAIL_KEY_BINDINGS: KeyBinding[] = [
       return false;
     },
   },
+  { key: "KeyQ", action: copyReference },
 ];
 
 const openBiblioTab = (): boolean => {

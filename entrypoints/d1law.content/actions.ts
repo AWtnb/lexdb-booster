@@ -9,6 +9,7 @@ import {
   parseCaseNumber,
   sanitizeString,
   SMOOTH_CSV_COL,
+  toHalfWidth,
   type Timestamp,
 } from "@/lib/text-utils";
 
@@ -231,4 +232,22 @@ export const pasteAndSearch = (clipboardText: string): boolean => {
   })();
   if (!result) return false;
   return pressSubmitButton();
+};
+
+export const copyReference = (): boolean => {
+  const [pageTitle] = document.getElementsByTagName("title");
+  if (!pageTitle) return false;
+  let base = toHalfWidth(pageTitle.textContent.trim());
+  const timestamp = matchTimestamp(base);
+  if (!timestamp) return false;
+  const ts = `${timestamp.date.yearLabel.text.slice(0, 1)}${timestamp.date.year}.${timestamp.date.month}.${timestamp.date.day}`;
+  base = base.replace(timestamp.text, ts);
+  if (base.startsWith("最高")) {
+    base = "最" + base.slice(2);
+  }
+  if (base.startsWith("大審院")) {
+    base = "大" + base.slice(3);
+  }
+  copyString(document, base);
+  return true;
 };
