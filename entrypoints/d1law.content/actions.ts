@@ -1,0 +1,103 @@
+import { copyString } from "@/lib/copy";
+import { parseCaseNumber, sanitizeString } from "@/lib/text-utils";
+
+export const pressClearButton = (): boolean => {
+  window.scrollTo(0, 0);
+  const el = document.getElementById("clearBtn") as HTMLButtonElement;
+  el.click();
+  return true;
+};
+
+export const pressSubmitButton = (): boolean => {
+  const el = document.getElementById("searchBtn") as HTMLButtonElement;
+  el.click();
+  return true;
+};
+
+export const closeAlertMessage = (): boolean => {
+  const button = document.querySelector(
+    ".dh-floating-widget__body button.dh-event--alert-close",
+  ) as HTMLButtonElement | null;
+  if (!button) return false;
+  button.click();
+  return true;
+};
+
+const fillCaseNumber = (s: string): boolean => {
+  const caseNumber = parseCaseNumber(sanitizeString(s));
+  if (!caseNumber) return false;
+
+  // 1. 元号をセット
+  const eraEl = document.getElementById(
+    "hanSearchIncidentGen1",
+  ) as HTMLSelectElement | null;
+  if (!eraEl) return false;
+  eraEl.value = caseNumber.yearCode;
+
+  // 2. 年をセット
+  const [yearEl] = document.getElementsByName("matterNoY");
+  if (!yearEl) return false;
+  (yearEl as HTMLInputElement).value = String(caseNumber.year);
+
+  // 3. 符号・事件番号をセット
+  const [signEl] = document.getElementsByName("matterNoKirokufu");
+  if (!signEl) return false;
+  (signEl as HTMLSelectElement).value = String(caseNumber.sign);
+
+  const [numEl] = document.getElementsByName("matterNoNum");
+  if (!numEl) return false;
+  (numEl as HTMLSelectElement).value = String(caseNumber.num);
+
+  return true;
+};
+
+export const pasteCaseNumber = (clipboardText: string): boolean => {
+  if (!pressClearButton()) return false;
+  if (fillCaseNumber(clipboardText)) {
+    return pressSubmitButton();
+  }
+  return false;
+};
+
+const getDetail = (header: string): string | null => {
+  const table = document.getElementById("detailBiblioInfo");
+  if (!table) return null;
+  const trs = table.getElementsByTagName("tr");
+  for (const tr of trs) {
+    const [th] = tr.getElementsByTagName("th");
+    const [td] = tr.getElementsByTagName("td");
+    if (!th || !td) continue;
+    if (th.textContent.trim() === header) return td.textContent.trim();
+  }
+  return null;
+};
+
+export const getDisplayedCaseNumber = (): string => {
+  const s = getDetail("裁判年月日等");
+  if (!s) return "";
+  const [cn] = s.split("／").filter((s) => /[０-９]+号/.exec(s));
+  if (!cn) return "";
+  return cn.replace(/）(?!第)/g, "）第");
+};
+
+export const copyCaseNumber = (): boolean => {
+  const c = getDisplayedCaseNumber();
+  if (c) {
+    copyString(document, c);
+    return true;
+  }
+  return false;
+};
+
+export const getDisplayedD1LawId = (): string => {
+  return getDetail("判例ID") ?? "";
+};
+
+export const copyD1LawId = (): boolean => {
+  const did = getDisplayedD1LawId();
+  if (did) {
+    copyString(document, did);
+    return true;
+  }
+  return false;
+};

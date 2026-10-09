@@ -1,9 +1,21 @@
-import { defineContentScript } from "#imports";
 import { setupHotkeys, type KeyBinding } from "@/lib/hotkey";
 
-const D1LAW_SEARCH_KEY_BINDINGS: KeyBinding[] = [];
+import { defineContentScript } from "#imports";
+import {
+  closeAlertMessage,
+  pasteCaseNumber,
+  pressClearButton,
+  pressSubmitButton,
+} from "./actions";
+import { setupDetailPage } from "./detail-page";
 
-const D1LAW_DETAIL_KEY_BINDINGS: KeyBinding[] = [];
+const D1LAW_SEARCH_KEY_BINDINGS: KeyBinding[] = [
+  { key: "Escape", action: closeAlertMessage },
+  { key: "A-KeyC", action: pressClearButton },
+  { key: "A-KeyL", action: pressSubmitButton },
+  { key: "A-Enter", action: pressSubmitButton },
+  { key: "KeyN", action: pasteCaseNumber },
+];
 
 export default defineContentScript({
   matches: [
@@ -12,13 +24,12 @@ export default defineContentScript({
     "https://han2-dh.d1-law.com/d1han/search/disp",
     "https://han2-dh.d1-law.com/d1han/detail/disp",
   ],
-  world: "MAIN",
   main: () => {
     const url = document.location.href;
     if (url.endsWith("search/disp")) {
       setupHotkeys(D1LAW_SEARCH_KEY_BINDINGS);
       return;
     }
-    setupHotkeys(D1LAW_DETAIL_KEY_BINDINGS);
+    setupDetailPage();
   },
 });
