@@ -43,14 +43,12 @@ const buildActionUrl = (action: string, cacheBuster: string): string => {
  * 指定インデックスの検索結果リンクを選択状態にしてフォームをサブミットする
  * チェックボックスのON・ボタン状態の更新・hidden inputへのID設定を行う
  */
-const openResult = (index: number): boolean => {
-  const results = document.querySelectorAll("a.list_link[data-id]");
-  const link = results[index] as HTMLAnchorElement;
-  const dataId = link.getAttribute("data-id");
+const openResult = (resultLink: HTMLAnchorElement): boolean => {
+  const dataId = resultLink.getAttribute("data-id");
   if (!dataId) return false;
 
   // チェックボックスをONにする
-  const row = link.closest("tr");
+  const row = resultLink.closest("tr");
   const checkbox = row?.querySelector<HTMLInputElement>(".check_list");
   if (checkbox) checkbox.checked = true;
 
@@ -84,5 +82,10 @@ const openResult = (index: number): boolean => {
  * ページロード時に呼び出すことを想定している
  */
 export const handleSearchResult = (): boolean => {
-  return openResult(0);
+  const results = document.querySelectorAll("a.list_link[data-id]");
+  if (results && results.length === 1) {
+    const result = results[0] as HTMLAnchorElement;
+    return openResult(result);
+  }
+  return false;
 };
