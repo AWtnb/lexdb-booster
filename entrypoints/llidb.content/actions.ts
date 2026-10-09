@@ -74,7 +74,7 @@ const fillCaseNumber = (s: string): boolean => {
   if (!caseNumber) return false;
 
   // 1. 元号をセット
-  const eraValue = YEAR_CODE_TO_LABEL_ALPHABET.get(caseNumber.code);
+  const eraValue = YEAR_CODE_TO_LABEL_ALPHABET.get(caseNumber.yearCode);
   if (!eraValue) return false;
 
   const [eraEl] = document.getElementsByName("CN1");

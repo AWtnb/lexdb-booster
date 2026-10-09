@@ -73,12 +73,12 @@ const setSelectBoxValue = (
 const fillCaseNumber = (doc: Document, s: string): boolean => {
   const caseNumber = parseCaseNumber(sanitizeString(s));
   if (!caseNumber) return false;
-  const { code, year, sign, num } = caseNumber;
+  const { yearCode, year, sign, num } = caseNumber;
 
   setSelectBoxValue(
     doc,
     "InputJikenBangou_Control_JikenBangou_DropDownList",
-    code,
+    yearCode,
   );
 
   [

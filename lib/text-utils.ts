@@ -69,10 +69,12 @@ const YEAR_LABELS = new Map(
 
 type YearLabel = Parameters<typeof YEAR_LABELS.get>[0];
 
+type YearCode = (typeof YEAR_LABEL_SOURCE)[number]["code"];
+
 /**
  * 元号コードを取得する（令和→5、平成→4など）
  */
-export const getYearCode = (s: string): string =>
+export const getYearCode = (s: string): YearCode | "" =>
   YEAR_LABELS.get(s as YearLabel) ?? "";
 
 const TIMESTAMP_REGEX =
@@ -131,17 +133,24 @@ const getCaseNumberMatch = (s: string): RegExpExecArray | null => {
 /**
  * 文字列で最初に登場する事件番号をパースする
  * 例：
- *    平成２０年（行コ）第３１号→{ code: "4", year: 20, sign: "行コ", num: 31 }
+ *    平成２０年（行コ）第３１号→{ yearCode: "4", year: 20, sign: "行コ", num: 31 }
  */
 export const parseCaseNumber = (
   str: string,
-): { code: string; year: number; sign: string; num: number } | null => {
+): {
+  yearCode: YearCode;
+  year: number;
+  sign: string;
+  num: number;
+} | null => {
   const m = getCaseNumberMatch(toHalfWidth(str));
   if (!m) return null;
   const { label, year, sign, num } = m.groups!;
   if (label && year && sign && num) {
+    const yearCode = getYearCode(label);
+    if (yearCode == "") return null;
     return {
-      code: getYearCode(label),
+      yearCode,
       year: year === "元" ? 1 : parseInt(year),
       sign: sign.replaceAll("(", "").replaceAll(")", ""),
       num: parseInt(num),
