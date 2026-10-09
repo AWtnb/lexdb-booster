@@ -61,6 +61,11 @@ const fillDateFields = (s: string): Timestamp | null => {
   // 4. 日をセット
   const dayEl = setSelectValue("ddlJudDay", String(timestamp.date.day));
   if (!dayEl) return null;
+
+  // 5. 「日指定」モードに
+  const modeEl = setSelectValue("ddlJudDateRestriction", "exact date");
+  if (!modeEl) return null;
+
   return timestamp;
 };
 
@@ -217,7 +222,7 @@ export const pasteAndSearch = (clipboardText: string): boolean => {
 
 export const goSearchHome = (): boolean => {
   window.location.href =
-    "https://go.westlawjapan.com/wljp/app/search/template?tid=wljpCasesSearchTemplate&clean=true";
+    "https://go.westlawjapan.com/wljp/app/search/template?tid=wljpCasesSearchTemplate&amp;bcp=1";
   return true;
 };
 

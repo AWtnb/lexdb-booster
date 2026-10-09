@@ -44,10 +44,7 @@ const WESTLAW_SEARCH_KEY_BINDINGS: KeyBinding[] = [
 const WESTLAW_DETAIL_KEY_BINDINGS: KeyBinding[] = [
   {
     key: "KeyH",
-    action: () => {
-      goSearchHome();
-      return true;
-    },
+    action: goSearchHome,
   },
   { key: "KeyC", action: copyCaseNumber },
   {
