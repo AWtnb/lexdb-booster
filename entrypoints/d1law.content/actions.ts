@@ -1,5 +1,10 @@
 import { copyString } from "@/lib/copy";
-import { parseCaseNumber, sanitizeString } from "@/lib/text-utils";
+import {
+  matchTimestamp,
+  parseCaseNumber,
+  sanitizeString,
+  type Timestamp,
+} from "@/lib/text-utils";
 
 export const pressClearButton = (): boolean => {
   window.scrollTo(0, 0);
@@ -32,7 +37,7 @@ const fillCaseNumber = (s: string): boolean => {
     "hanSearchIncidentGen1",
   ) as HTMLSelectElement | null;
   if (!eraEl) return false;
-  eraEl.value = caseNumber.yearCode;
+  eraEl.value = caseNumber.yearLabel.code;
 
   // 2. 年をセット
   const [yearEl] = document.getElementsByName("matterNoY");
@@ -101,3 +106,33 @@ export const copyD1LawId = (): boolean => {
   }
   return false;
 };
+
+/**
+ * 日付欄を埋める
+ */
+const fillDateFields = (s: string): Timestamp | null => {
+  const timestamp = matchTimestamp(sanitizeString(s));
+  if (!timestamp) return null;
+
+  // 1. 元号をセット
+  const [labelEl] = document.getElementsByName("judgementDateFromGengo");
+  if (!labelEl) return null;
+  (labelEl as HTMLSelectElement).value = timestamp.date.yearLabel.code;
+
+  // 2. 年をセット
+  const yearEl = document.getElementsByName("T12")[0] as HTMLInputElement;
+  yearEl.value = String(timestamp.date.year);
+
+  // 3. 月をセット
+  const monthEl = document.getElementsByName("T13")[0] as HTMLInputElement;
+  monthEl.value = String(timestamp.date.month);
+
+  // 4. 日をセット
+  const dayEl = document.getElementsByName("T14")[0] as HTMLInputElement;
+  dayEl.value = String(timestamp.date.day);
+
+  return timestamp;
+};
+
+export const pasteDateField = (clipboardText: string): boolean =>
+  fillDateFields(clipboardText) !== null;

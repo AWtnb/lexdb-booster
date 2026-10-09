@@ -9,17 +9,9 @@ import {
   parseCaseNumber,
   sanitizeString,
   SMOOTH_CSV_COL,
-  YEAR_LABEL_SOURCE,
+  YEAR_LABEL_ABBREV_TO_FULL,
   type Timestamp,
 } from "@/lib/text-utils";
-
-const YEAR_LABEL_VAR_MAP = new Map([
-  ["令", "236"],
-  ["平", "235"],
-  ["昭", "234"],
-  ["大", "233"],
-  ["明", "232"],
-]);
 
 /**
  * selectElementのvalueをセットし、onchangeイベントを発火する
@@ -43,11 +35,9 @@ const fillDateFields = (s: string): Timestamp | null => {
   const timestamp = matchTimestamp(sanitizeString(s));
   if (!timestamp) return null;
 
-  const yearValue = YEAR_LABEL_VAR_MAP.get(timestamp.date.label.slice(0, 1));
-  if (!yearValue) return null;
-
   // 1. 元号をセット
-  const eraEl = setSelectValue("ddlJudEra", yearValue);
+  const yearLabelValue = String(Number(timestamp.date.yearLabel.code) + 231);
+  const eraEl = setSelectValue("ddlJudEra", yearLabelValue);
   if (!eraEl) return null;
 
   // 2. 年をセット
@@ -73,13 +63,6 @@ export const pasteDateField = (clipboardText: string): boolean =>
   fillDateFields(clipboardText) !== null;
 
 /**
- * 年号コードから元号選択ボックスのvalue（漢字1文字）に変換するマップ
- */
-const YEAR_CODE_TO_LABEL_ABBREV = new Map<string, string>(
-  YEAR_LABEL_SOURCE.map(({ code, labels }) => [code, labels[1]] as const),
-);
-
-/**
  * 事件番号欄を埋める
  */
 const fillCaseNumber = (s: string): boolean => {
@@ -87,10 +70,16 @@ const fillCaseNumber = (s: string): boolean => {
   if (!caseNumber) return false;
 
   // 1. 元号をセット
-  const eraValue = YEAR_CODE_TO_LABEL_ABBREV.get(caseNumber.yearCode);
-  if (!eraValue) return false;
-
-  const eraEl = setSelectValue("ddlCaseNumEra", eraValue);
+  const yearLabelValue = (() => {
+    const yearLabel = caseNumber.yearLabel.text;
+    if (yearLabel === "R") return "令";
+    if (yearLabel === "H") return "平";
+    if (yearLabel === "S") return "昭";
+    if (yearLabel === "T") return "大";
+    if (yearLabel === "M") return "明";
+    return yearLabel.slice(0, 1);
+  })();
+  const eraEl = setSelectValue("ddlCaseNumEra", yearLabelValue);
   if (!eraEl) return false;
 
   // 2. 年をセット
@@ -249,13 +238,6 @@ export const clearInput = (): boolean => {
 
   return true;
 };
-
-/**
- * 年号コード短縮形（「平」）からフル表記（「平成」）に変換するマップ
- */
-const YEAR_LABEL_ABBREV_TO_FULL = new Map<string, string>(
-  YEAR_LABEL_SOURCE.map(({ labels }) => [labels[1], labels[0]] as const),
-);
 
 /**
  * 要旨欄の内容を取得する

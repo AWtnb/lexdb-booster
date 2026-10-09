@@ -5,7 +5,6 @@ import {
 } from "@/lib/court";
 import {
   formatDetail,
-  getYearCode,
   matchTimestamp,
   parseCaseNumber,
   sanitizeString,
@@ -73,12 +72,12 @@ const setSelectBoxValue = (
 const fillCaseNumber = (doc: Document, s: string): boolean => {
   const caseNumber = parseCaseNumber(sanitizeString(s));
   if (!caseNumber) return false;
-  const { yearCode, year, sign, num } = caseNumber;
+  const { yearLabel, year, sign, num } = caseNumber;
 
   setSelectBoxValue(
     doc,
     "InputJikenBangou_Control_JikenBangou_DropDownList",
-    yearCode,
+    yearLabel.code,
   );
 
   [
@@ -118,7 +117,7 @@ const fillDateFields = (doc: Document, s: string): Timestamp | null => {
   setSelectBoxValue(
     doc,
     "InputHanketuYMD_Control_NENGOU_DropDownList0",
-    getYearCode(timestamp.date.label),
+    timestamp.date.yearLabel.code,
   );
 
   [

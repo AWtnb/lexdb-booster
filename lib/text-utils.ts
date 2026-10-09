@@ -49,7 +49,7 @@ export const getCurrentClipboardText = async (): Promise<string> => {
  * 年号にコードを割り当てる。明治を1、令和を5にするのは検索ページの
  * 日付選択ボックスの value に対応させている。
  */
-export const YEAR_LABEL_SOURCE = [
+const YEAR_LABEL_SOURCE = [
   { code: "5", labels: ["令和", "令", "R"] },
   { code: "4", labels: ["平成", "平", "H"] },
   { code: "3", labels: ["昭和", "昭", "S"] },
@@ -58,36 +58,47 @@ export const YEAR_LABEL_SOURCE = [
 ] as const;
 
 /**
+ * 年号コードからアルファベットに変換するマップ
+ */
+export const YEAR_LABEL_CODE_TO_ALPHABET = new Map(
+  YEAR_LABEL_SOURCE.map(({ code, labels }) => [code, labels[2]] as const),
+);
+
+/**
+ * 年号コード短縮形（「平」）からフル表記（「平成」）に変換するマップ
+ */
+export const YEAR_LABEL_ABBREV_TO_FULL = new Map<string, string>(
+  YEAR_LABEL_SOURCE.map(({ labels }) => [labels[1], labels[0]] as const),
+);
+
+/**
  * 年号ラベルをコードに変換するマップ。
  * キーは「令和」「平」「H」などのラベル、値は「5」「4」などのコード。
  */
-const YEAR_LABELS = new Map(
+const LABEL_TO_YEAR_CODE_MAPPING = new Map(
   YEAR_LABEL_SOURCE.flatMap(({ code, labels }) =>
     labels.map((label) => [label, code] as const),
   ),
 );
 
-type YearLabel = Parameters<typeof YEAR_LABELS.get>[0];
+type YearLabel = (typeof YEAR_LABEL_SOURCE)[number]["labels"][number];
 
-type YearCode = (typeof YEAR_LABEL_SOURCE)[number]["code"];
-
-/**
- * 元号コードを取得する（令和→5、平成→4など）
- */
-export const getYearCode = (s: string): YearCode | "" =>
-  YEAR_LABELS.get(s as YearLabel) ?? "";
+type YearLabelCode = (typeof YEAR_LABEL_SOURCE)[number]["code"];
 
 const TIMESTAMP_REGEX =
   /(……)?(?<year>[0-9０-９]{1,2}|元)(（[0-9]{4}）)?[年・\.](?<month>[0-9０-９]{1,2})[月・\.](?<day>[0-9０-９]{1,2})日?/;
 
-const ALL_YEAR_LABELS = [...YEAR_LABELS.keys()];
+const ALL_YEAR_LABELS = [...LABEL_TO_YEAR_CODE_MAPPING.keys()];
 
 export type Timestamp = {
   text: string;
   start: number;
   end: number;
   date: {
-    label: string;
+    yearLabel: {
+      text: YearLabel;
+      code: YearLabelCode;
+    };
     year: number;
     month: number;
     day: number;
@@ -111,7 +122,10 @@ export const matchTimestamp = (s: string): Timestamp | null => {
     start: m.index - label.length,
     end: m.index + m[0].length,
     date: {
-      label,
+      yearLabel: {
+        text: label,
+        code: LABEL_TO_YEAR_CODE_MAPPING.get(label)!,
+      },
       year: m[2] === "元" ? 1 : parseInt(toHalfWidth(year!)),
       month: parseInt(toHalfWidth(month!)),
       day: parseInt(toHalfWidth(day!)),
@@ -125,7 +139,7 @@ const getCaseNumberMatch = (s: string): RegExpExecArray | null => {
       s,
     );
   if (fullMatch) return fullMatch;
-  return /(?<label>明治?|大正?|昭和?|平成?|令和?)(?<year>[0-9]{1,2}|元)年?(?<sign>.?\(.{1,3}\))(?<num>[0-9]+)号?/.exec(
+  return /(?<label>明治?|大正?|昭和?|平成?|令和?|R|H|S|T|M)(?<year>[0-9]{1,2}|元)年?(?<sign>.?\(.{1,3}\))(?<num>[0-9]+)号?/.exec(
     s,
   );
 };
@@ -133,12 +147,16 @@ const getCaseNumberMatch = (s: string): RegExpExecArray | null => {
 /**
  * 文字列で最初に登場する事件番号をパースする
  * 例：
- *    平成２０年（行コ）第３１号→{ yearCode: "4", year: 20, sign: "行コ", num: 31 }
+ *    平成２０年（行コ）第３１号
+ *     →{ yearLabel: {text: "平成", code: "4"}, year: 20, sign: "行コ", num: 31 }
  */
 export const parseCaseNumber = (
   str: string,
 ): {
-  yearCode: YearCode;
+  yearLabel: {
+    text: YearLabel;
+    code: YearLabelCode;
+  };
   year: number;
   sign: string;
   num: number;
@@ -146,17 +164,20 @@ export const parseCaseNumber = (
   const m = getCaseNumberMatch(toHalfWidth(str));
   if (!m) return null;
   const { label, year, sign, num } = m.groups!;
-  if (label && year && sign && num) {
-    const yearCode = getYearCode(label);
-    if (yearCode == "") return null;
-    return {
-      yearCode,
-      year: year === "元" ? 1 : parseInt(year),
-      sign: sign.replaceAll("(", "").replaceAll(")", ""),
-      num: parseInt(num),
-    };
-  }
-  return null;
+  if (!label || !year || !sign || !num) return null;
+
+  const labelCode = LABEL_TO_YEAR_CODE_MAPPING.get(label as YearLabel);
+  if (!labelCode) return null;
+
+  return {
+    yearLabel: {
+      text: label as YearLabel,
+      code: labelCode,
+    },
+    year: year === "元" ? 1 : parseInt(year),
+    sign: sign.replaceAll("(", "").replaceAll(")", ""),
+    num: parseInt(num),
+  };
 };
 
 /** 出典の詳細欄を整形する */

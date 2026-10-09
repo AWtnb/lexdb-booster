@@ -10,7 +10,7 @@ import {
   sanitizeString,
   SMOOTH_CSV_COL,
   toHalfWidth,
-  YEAR_LABEL_SOURCE,
+  YEAR_LABEL_CODE_TO_ALPHABET,
   type Timestamp,
 } from "@/lib/text-utils";
 
@@ -62,21 +62,13 @@ export const pasteLliId = (clipboardText: string): boolean => {
   return false;
 };
 
-/**
- * 年号コードから元号選択ボックスのvalue（アルファベット1文字）に変換するマップ
- */
-const YEAR_CODE_TO_LABEL_ALPHABET = new Map<string, string>(
-  YEAR_LABEL_SOURCE.map(({ code, labels }) => [code, labels[2]] as const),
-);
-
 const fillCaseNumber = (s: string): boolean => {
   const caseNumber = parseCaseNumber(sanitizeString(s));
   if (!caseNumber) return false;
 
   // 1. 元号をセット
-  const eraValue = YEAR_CODE_TO_LABEL_ALPHABET.get(caseNumber.yearCode);
+  const eraValue = YEAR_LABEL_CODE_TO_ALPHABET.get(caseNumber.yearLabel.code);
   if (!eraValue) return false;
-
   const [eraEl] = document.getElementsByName("CN1");
   if (!eraEl) return false;
   (eraEl as HTMLSelectElement).value = eraValue;
@@ -265,21 +257,14 @@ export const copyReference = (): boolean => {
 };
 
 /**
- * 年号1文字目から元号選択ボックスのvalue（アルファベット1文字）に変換するマップ
- */
-const YEAR_LABEL_ABBREV_TO_ALPHABET = new Map<string, string>(
-  YEAR_LABEL_SOURCE.map(({ labels }) => [labels[1], labels[2]] as const),
-);
-
-/**
  * 日付欄を埋める
  */
 const fillDateFields = (s: string): Timestamp | null => {
   const timestamp = matchTimestamp(sanitizeString(s));
   if (!timestamp) return null;
 
-  const yearLabelValue = YEAR_LABEL_ABBREV_TO_ALPHABET.get(
-    timestamp.date.label.slice(0, 1),
+  const yearLabelValue = YEAR_LABEL_CODE_TO_ALPHABET.get(
+    timestamp.date.yearLabel.code,
   );
   if (!yearLabelValue) return null;
 
