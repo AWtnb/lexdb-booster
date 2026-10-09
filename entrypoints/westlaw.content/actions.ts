@@ -131,10 +131,15 @@ export const pasteCaseNumber = (clipboardText: string): boolean => {
 };
 
 const fillFreewords = (freewords: string[]): boolean => {
-  const el = document.getElementById("ft") as HTMLInputElement | null;
-  if (!el) return false;
+  const el = document.getElementById("ft") as HTMLInputElement;
   el.value = freewords.filter(Boolean).join(" ").trim();
   return 0 < el.value.length;
+};
+
+export const focusFreeWord = (): boolean => {
+  const el = document.getElementById("ft") as HTMLInputElement;
+  el.select();
+  return true;
 };
 
 /**

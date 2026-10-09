@@ -1,3 +1,4 @@
+import { hasAltModifier } from "@/lib/keystring";
 import { getCurrentClipboardText } from "@/lib/text-utils";
 import type { ActionEntry } from "../actions/registry";
 import { ACTION_REGISTRY } from "../actions/registry";
@@ -9,11 +10,6 @@ import {
 } from "../page";
 import type { HotkeyContext, KeyBinding } from "../types";
 import { DEFAULT_KEY_BINDINGS } from "./keybindings";
-
-/**
- * Alt修飾キーを含むキーバインドかどうか
- */
-const hasAltModifier = (key: string): boolean => key.startsWith("A-");
 
 /**
  * スコープ・isInputableElemを照合して発火可否を返す

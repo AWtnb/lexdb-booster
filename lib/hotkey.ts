@@ -1,4 +1,8 @@
-import { buildKeyString, isEventOnInputableElem } from "./keystring";
+import {
+  buildKeyString,
+  hasAltModifier,
+  isEventOnInputableElem,
+} from "./keystring";
 import { getCurrentClipboardText } from "./text-utils";
 
 export type KeyBinding = {
@@ -16,8 +20,8 @@ const handleHotkey = async (pressed: string, bindings: KeyBinding[]) => {
 
 export const setupHotkeys = (bindings: KeyBinding[]) => {
   document.onkeyup = async (keyEvent) => {
-    if (isEventOnInputableElem(keyEvent)) return;
     const pressed = buildKeyString(keyEvent);
+    if (isEventOnInputableElem(keyEvent) && !hasAltModifier(pressed)) return;
     await handleHotkey(pressed, bindings);
   };
 };

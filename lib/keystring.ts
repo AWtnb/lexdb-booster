@@ -92,3 +92,8 @@ export const isEventOnInputableElem = (keyEvent: KeyboardEvent): boolean => {
   }
   return false;
 };
+
+/**
+ * Alt修飾キーを含むキーバインドかどうか
+ */
+export const hasAltModifier = (key: string): boolean => key.includes("A-");

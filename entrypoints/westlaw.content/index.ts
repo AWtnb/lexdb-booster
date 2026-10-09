@@ -6,6 +6,7 @@ import {
   copyCaseNumber,
   copyReference,
   copyWljpId,
+  focusFreeWord,
   getDisplayedCaseNumber,
   getDisplayedWljpId,
   goSearchHome,
@@ -34,6 +35,7 @@ const suppressInitialFocus = () => {
 const WESTLAW_SEARCH_KEY_BINDINGS: KeyBinding[] = [
   { key: "KeyD", action: pasteDateField },
   { key: "KeyN", action: pasteCaseNumber },
+  { key: "KeyF", action: focusFreeWord },
   { key: "KeyL", action: pasteWljpId },
   { key: "A-Enter", action: pressSubmitButton },
   { key: "A-KeyL", action: pressSubmitButton },
