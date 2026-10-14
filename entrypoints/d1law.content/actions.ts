@@ -87,9 +87,9 @@ const getDetail = (header: string): string | null => {
 export const getDisplayedCaseNumber = (): string => {
   const s = getDetail("裁判年月日等");
   if (!s) return "";
-  const [cn] = s.split("／").filter((s) => /[０-９]+号/.exec(s));
-  if (!cn) return "";
-  return cn.replace(/）(?!第)/g, "）第");
+  const cns = s.split("／").filter((s) => /[０-９]+号/.exec(s));
+  if (cns.length < 1) return "";
+  return cns.map((cn) => cn.replace(/）(?!第)/g, "）第")).join("、");
 };
 
 export const copyCaseNumber = (): boolean => {
