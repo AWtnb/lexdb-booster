@@ -74,6 +74,7 @@ const LLIDB_DETAIL_KEY_BINDINGS: KeyBinding[] = [
 
 export default defineContentScript({
   matches: [
+    "https://www.legal-info.com/net/menu",
     "https://www.legal-info.com/net/search",
     "https://www.legal-info.com/net/search/list",
     "https://www.legal-info.com/net/detail?*",
@@ -82,6 +83,15 @@ export default defineContentScript({
   allFrames: true,
   main: () => {
     const url = document.location.href;
+    if (url.endsWith("menu")) {
+      const b = document.querySelector(
+        "#basic_db-01  button",
+      ) as HTMLButtonElement | null;
+      if (b) {
+        b.focus();
+      }
+      return;
+    }
     if (url.endsWith("search")) {
       setupHotkeys(LLIDB_SEARCH_KEY_BINDINGS);
       return;
