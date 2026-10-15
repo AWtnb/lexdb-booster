@@ -65,6 +65,13 @@ export const YEAR_LABEL_CODE_TO_ALPHABET = new Map(
 );
 
 /**
+ * 年号コードから年号略称（「平」「令」など）変換するマップ
+ */
+export const YEAR_LABEL_CODE_TO_LABEL_ABBREV = new Map(
+  YEAR_LABEL_SOURCE.map(({ code, labels }) => [code, labels[1]] as const),
+);
+
+/**
  * 年号コード短縮形（「平」）からフル表記（「平成」）に変換するマップ
  */
 export const YEAR_LABEL_ABBREV_TO_FULL = new Map<string, string>(

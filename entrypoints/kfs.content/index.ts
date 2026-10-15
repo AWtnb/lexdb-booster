@@ -1,5 +1,9 @@
 import { defineContentScript } from "#imports";
-import { syncDateInput } from "./search-page";
+import { setupHotkeys, type KeyBinding } from "@/lib/hotkey";
+import { styleUp } from "./result-page";
+import { pasteDateField, syncDateInput } from "./search-page";
+
+const KEYBINDINGS: KeyBinding[] = [{ key: "KeyD", action: pasteDateField }];
 
 export default defineContentScript({
   matches: [
@@ -20,7 +24,9 @@ export default defineContentScript({
     }
     if (url.endsWith("editCriteriaByKeyword")) {
       syncDateInput();
+      setupHotkeys(KEYBINDINGS);
       return;
     }
+    styleUp();
   },
 });

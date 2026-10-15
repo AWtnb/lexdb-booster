@@ -12,7 +12,7 @@ export const styleUp = () => {
     const lastCell = cells.pop();
     if (!lastCell) return;
     const m = lastCell.innerText.match(
-      /([明大昭平令])([0-9]+|元)[-−–—]([0-9]+)/,
+      /([明大昭平令])\s*([0-9]+|元)[-−–—]([0-9]+)/,
     );
     if (m) {
       const y = m[2] == "元" ? "１" : toFullWidth(m[2]!);
