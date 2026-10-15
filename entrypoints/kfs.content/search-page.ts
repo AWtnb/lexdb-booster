@@ -30,6 +30,27 @@ export const syncDateInput = () => {
   });
 };
 
+const setRadioButton = (): boolean => {
+  const el = document.getElementById("rdDate2") as HTMLInputElement | null;
+  if (!el) return false;
+  el.click();
+  return el.checked;
+};
+
+export const pressCommitButton = (): boolean => {
+  const [el] = document.getElementsByName("commit");
+  if (!el) return false;
+  (el as HTMLInputElement).click();
+  return true;
+};
+
+export const pressResetButton = (): boolean => {
+  const [el] = document.getElementsByName("reset");
+  if (!el) return false;
+  (el as HTMLInputElement).click();
+  return true;
+};
+
 type FormField = HTMLInputElement | HTMLSelectElement;
 
 const setFieldValue = (el: FormField, value: string): boolean => {
@@ -44,6 +65,8 @@ const setFieldValue = (el: FormField, value: string): boolean => {
 };
 
 const fillDateFields = (s: string): boolean => {
+  if (!setRadioButton()) return false;
+
   const timestamp = matchTimestamp(sanitizeString(s));
   if (!timestamp) return false;
 

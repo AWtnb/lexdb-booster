@@ -1,9 +1,22 @@
 import { defineContentScript } from "#imports";
 import { setupHotkeys, type KeyBinding } from "@/lib/hotkey";
-import { styleUp } from "./result-page";
-import { pasteDateField, syncDateInput } from "./search-page";
+import { goSearchHome, styleUp } from "./result-page";
+import {
+  pasteDateField,
+  pressCommitButton,
+  pressResetButton,
+  syncDateInput,
+} from "./search-page";
 
-const KEYBINDINGS: KeyBinding[] = [{ key: "KeyD", action: pasteDateField }];
+const SEARCH_PAGE_KEYBINDINGS: KeyBinding[] = [
+  { key: "KeyD", action: pasteDateField },
+  { key: "A-KeyL", action: pressCommitButton },
+  { key: "A-Enter", action: pressCommitButton },
+  { key: "A-KeyC", action: pressResetButton },
+];
+const RESULT_PAGE_KEYBINDINGS: KeyBinding[] = [
+  { key: "KeyH", action: goSearchHome },
+];
 
 export default defineContentScript({
   matches: [
@@ -24,9 +37,10 @@ export default defineContentScript({
     }
     if (url.endsWith("editCriteriaByKeyword")) {
       syncDateInput();
-      setupHotkeys(KEYBINDINGS);
+      setupHotkeys(SEARCH_PAGE_KEYBINDINGS);
       return;
     }
+    setupHotkeys(RESULT_PAGE_KEYBINDINGS);
     styleUp();
   },
 });

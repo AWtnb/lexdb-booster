@@ -25,3 +25,9 @@ export const styleUp = () => {
     }
   });
 };
+
+export const goSearchHome = (): boolean => {
+  window.location.href =
+    "https://www.kfs.go.jp/cgi-bin/sysrch/prj/web/pub/editCriteriaByKeyword";
+  return true;
+};
