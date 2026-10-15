@@ -119,6 +119,13 @@ export const pasteCaseNumber = (clipboardText: string): boolean => {
   return false;
 };
 
+const fillCourtName = (name: string): boolean => {
+  if (name.length < 1) return false;
+  const el = document.getElementById("fldCourt") as HTMLInputElement;
+  el.value = name;
+  return 0 < el.value.length;
+};
+
 const fillFreewords = (freewords: string[]): boolean => {
   const el = document.getElementById("ft") as HTMLInputElement;
   el.value = freewords.filter(Boolean).join(" ").trim();
@@ -160,14 +167,12 @@ const pastePrecedent = (s: string): boolean => {
   const caseNumberFillResult = fillCaseNumber(s);
   const filledTimestamp = fillDateFields(s);
 
-  const freewords = [];
-
   const courtName = deriveLeadingCourtName(s);
-  if (courtName) freewords.push(formatCourtName(courtName));
+  const courtNameFillResult = fillCourtName(courtName);
 
-  const freewordFillResult = fillFreewords(freewords);
-
-  return caseNumberFillResult || filledTimestamp !== null || freewordFillResult;
+  return (
+    caseNumberFillResult || filledTimestamp !== null || courtNameFillResult
+  );
 };
 
 /**
@@ -189,13 +194,11 @@ const pasteSmoothCsv = (s: string): boolean => {
     return true;
   }
 
-  const freewords = [];
   const courtExpanded = expandCourtAbbrev(court);
-  if (courtExpanded) freewords.push(formatCourtName(courtExpanded));
+  const courtNameFillResult = fillCourtName(formatCourtName(courtExpanded));
 
   const dateFillResult = fillDateFields(date) !== null;
-  const freewordFillResult = fillFreewords(freewords);
-  return dateFillResult || freewordFillResult;
+  return dateFillResult || courtNameFillResult;
 };
 
 /**

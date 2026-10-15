@@ -31,6 +31,20 @@ const suppressInitialFocus = () => {
 
   ft.addEventListener("focus", onFocus);
 };
+const WESTLAW_WELCOME_PAGE_KEY_BINDINGS: KeyBinding[] = [
+  { key: "KeyH", action: goSearchHome },
+  {
+    key: "KeyF",
+    action: () => {
+      const el = document.getElementById("ft") as HTMLInputElement | null;
+      if (el) {
+        el.select();
+        return true;
+      }
+      return false;
+    },
+  },
+];
 
 const WESTLAW_SEARCH_KEY_BINDINGS: KeyBinding[] = [
   { key: "KeyD", action: pasteDateField },
@@ -109,17 +123,19 @@ export default defineContentScript({
   main: () => {
     const url = document.location.href;
     if (url.includes("wljp/app/welcome")) {
-      document.getElementById("ft")?.focus();
+      setupHotkeys(WESTLAW_WELCOME_PAGE_KEY_BINDINGS);
       return;
     }
     if (url.includes("wljp/app/search")) {
       suppressInitialFocus();
       setupHotkeys(WESTLAW_SEARCH_KEY_BINDINGS);
+      return;
     }
     if (url.includes("wljp/app/doc")) {
       setupHotkeys(WESTLAW_DETAIL_KEY_BINDINGS);
       styleUpDetailPage();
       observeDetailPane();
+      return;
     }
   },
 });
