@@ -45,6 +45,10 @@ const main = (): void => {
   console.log(`${latest} → ${newTag}`);
 
   updatePackageJson(newTag);
+
+  // 新バージョンが反映された状態でビルドする
+  execSync("pnpm build", { stdio: "inherit" });
+
   execSync("git add package.json");
   execSync(`git commit -m "chore: bump version to ${newTag}"`);
   execSync(`git tag ${newTag}`);
