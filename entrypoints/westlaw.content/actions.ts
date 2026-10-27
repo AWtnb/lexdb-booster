@@ -190,6 +190,7 @@ const pasteSmoothCsv = (s: string): boolean => {
     return true;
   }
 
+  const dateFillResult = fillDateFields(date) !== null;
   if (fillCaseNumber(casenumber)) {
     return true;
   }
@@ -197,7 +198,6 @@ const pasteSmoothCsv = (s: string): boolean => {
   const courtExpanded = expandCourtAbbrev(court);
   const courtNameFillResult = fillCourtName(formatCourtName(courtExpanded));
 
-  const dateFillResult = fillDateFields(date) !== null;
   return dateFillResult || courtNameFillResult;
 };
 

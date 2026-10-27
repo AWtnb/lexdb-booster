@@ -298,6 +298,7 @@ const pasteSmoothCsv = (doc: Document, cb: string): boolean => {
     return true;
   }
 
+  const dateFillResult = fillDateFields(doc, date) !== null;
   if (fillCaseNumber(doc, casenumber)) {
     return true;
   }
@@ -310,7 +311,6 @@ const pasteSmoothCsv = (doc: Document, cb: string): boolean => {
   }
   freewords.push(formatDetail(detail));
 
-  const dateFillResult = fillDateFields(doc, date) !== null;
   const freewordFillResult = fillFreewords(doc, sliceFreewords(freewords));
   return dateFillResult || freewordFillResult;
 };
