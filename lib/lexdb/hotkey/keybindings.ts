@@ -12,7 +12,6 @@ export const DEFAULT_KEY_BINDINGS: KeyBinding[] = [
   { key: "A-Enter", actionId: "submitSearch" },
   { key: "A-KeyL", actionId: "submitSearch" },
   { key: "KeyV", actionId: "pasteAndSearch" },
-  { key: "A-KeyC", actionId: "clearAllInputBox" },
   { key: "KeyC", actionId: "clearAllInputBox" },
   { key: "KeyN", actionId: "pasteCaseNumber" },
   { key: "KeyD", actionId: "pasteDate" },
