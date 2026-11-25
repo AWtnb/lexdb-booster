@@ -2,6 +2,10 @@ import { defineContentScript } from "#imports";
 
 const FOCUS_TARGETS = [
   {
+    match: "https://www.lawlibrary.jp/Law/LoginForm.aspx",
+    id: "ImageButton1",
+  },
+  {
     match: "https://www.lawlibrary.jp/Law/ReLoginForm.aspx",
     id: "LinkButton1",
   },
