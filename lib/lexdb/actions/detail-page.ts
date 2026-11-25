@@ -144,8 +144,10 @@ export const copyFullReference: HotkeyAction = ({ bodyDocument }): boolean => {
   return false;
 };
 
-export const gotoZenbun: HotkeyAction = ({ headDocument }): boolean => {
-  const l = headDocument.getElementById("ShowZenbunHyperLink");
+export const gotoZenbun: HotkeyAction = ({ bodyDocument }): boolean => {
+  const l = bodyDocument.querySelector(
+    "a.full-text-button[title='全文へ']",
+  ) as HTMLAnchorElement;
   if (l) {
     l.click();
     return true;
