@@ -1,22 +1,3 @@
-const FONT_NAME = "LexDBNotoSansJP";
-
-const getFontUrl = (): string => document.documentElement.dataset.fontUrl ?? "";
-
-const injectFontFace = (doc: Document): void => {
-  if (doc.getElementById("lexdb-booster-font")) return;
-  const style = doc.createElement("style");
-
-  style.id = "lexdb-booster-font";
-  style.textContent = `
-@font-face {
-  font-family: "${FONT_NAME}";
-  src: url("${getFontUrl()}") format("truetype");
-  font-style: normal;
-  font-display: swap;
-}`;
-  (doc.head ?? doc.documentElement).appendChild(style);
-};
-
 /** 審級関係セクションの開始見出し */
 const APPEAL_INSTANCE_HEADER = "【審級関係】";
 
@@ -59,9 +40,7 @@ const borderHistory = (doc: Document): void => {
  * 検索結果ページのスタイル適用
  */
 export const applySearchResultPageStyles = (doc: Document): void => {
-  injectFontFace(doc);
   Array.from(doc.getElementsByTagName("td")).forEach((elem) => {
-    elem.style.fontFamily = FONT_NAME;
     elem.style.height = "1.5em";
     if (elem.classList.contains("ListLow3")) {
       elem.style.background = "gold";
@@ -116,12 +95,34 @@ const HEADING_BACKGROUND_MAP: Record<string, string> = {
  */
 const REORDER_HEADINGS = ["【事件番号】", "【掲載文献】", "【備考】"] as const;
 
+/** ヘッダー行の総数（先頭のヘッダー行を含む） */
+const HEADER_ROW_COUNT = 3;
+
+/**
+ * ヘッダー行群の最後の行を取得する。
+ * 先頭のヘッダー行から、続く行をヘッダーと見なして辿る。
+ */
+const findLastHeaderRow = (doc: Document): HTMLTableRowElement | null => {
+  const firstRow = doc.querySelector<HTMLTableRowElement>(
+    "tr:has(> td.syoshi-table-header-cell)",
+  );
+  if (!firstRow) return null;
+
+  let last = firstRow;
+  for (let i = 1; i < HEADER_ROW_COUNT; i++) {
+    const next = last.nextElementSibling as HTMLTableRowElement;
+    if (next?.tagName !== "TR") break;
+    last = next;
+  }
+  return last;
+};
+
 /**
  * 詳細ページのスタイル適用
  * 【事件番号】【掲載文献】【備考】を色分けしつつ、テーブル先頭に並び替える
  */
 export const applyDetailPageStyles = (doc: Document): void => {
-  const table = doc.querySelector("table");
+  const table = doc.querySelector("table.syoshi-table");
   if (!table) return;
 
   borderHistory(doc);
@@ -131,10 +132,7 @@ export const applyDetailPageStyles = (doc: Document): void => {
     REORDER_HEADINGS.map((h) => [h, []]),
   );
 
-  injectFontFace(doc);
   Array.from(doc.getElementsByTagName("td")).forEach((elem) => {
-    elem.style.lineHeight = "1.5";
-    elem.style.fontFamily = FONT_NAME;
     const text = elem.innerText;
 
     if (text.startsWith("【")) {
@@ -151,13 +149,15 @@ export const applyDetailPageStyles = (doc: Document): void => {
     }
   });
 
-  // 【事件番号】【掲載文献】【備考】の行をテーブルの先頭に移動
-  const tbody = table.querySelector("tbody") ?? table;
-  const firstRow = tbody.querySelector("tr");
+  // 【事件番号】【掲載文献】【備考】の行をヘッダー行群の直下に移動
+  const lastHeaderRow = findLastHeaderRow(doc);
+  if (!lastHeaderRow) return;
 
+  let anchor: HTMLTableRowElement = lastHeaderRow;
   REORDER_HEADINGS.forEach((heading) => {
     reorderRowsMap.get(heading)?.forEach((row) => {
-      tbody.insertBefore(row, firstRow);
+      anchor.after(row);
+      anchor = row;
     });
   });
 };

@@ -7,12 +7,12 @@ import type {
 import type { ActionEntry } from "./registry";
 
 export const getSyoshiAnchors = (doc: Document): Element[] =>
-  Array.from(doc.querySelectorAll("tr > td[rowspan='3'] a"));
+  Array.from(doc.querySelectorAll("tr > td a.link-syoshi"));
 
 const openResult = (ctx: HotkeyContext, index: number): boolean => {
   const anchors = getSyoshiAnchors(ctx.bodyDocument);
   if (!anchors) return false;
-  const target = anchors[index * 2];
+  const target = anchors[index];
   const js = target?.getAttribute("href");
   if (!js) return false;
 
