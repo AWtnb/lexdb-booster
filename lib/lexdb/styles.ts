@@ -1,3 +1,16 @@
+const injectHighlightAtyle = (doc: Document): void => {
+  const styleID = "lexdb-booster-highlight";
+  if (doc.getElementById(styleID)) return;
+  const style = doc.createElement("style");
+
+  style.id = styleID;
+  style.textContent = `
+.lex-highlight--variant {
+  outline: solid 1px tomato;
+}`;
+  (doc.head ?? doc.documentElement).appendChild(style);
+};
+
 /** 審級関係セクションの開始見出し */
 const APPEAL_INSTANCE_HEADER = "【審級関係】";
 
@@ -136,6 +149,7 @@ export const applyDetailPageStyles = (doc: Document): void => {
   const table = doc.querySelector("table.syoshi-table");
   if (!table) return;
 
+  injectHighlightAtyle(doc);
   borderHistory(doc);
 
   let background = "inherit";
