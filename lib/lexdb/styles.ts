@@ -37,21 +37,32 @@ const borderHistory = (doc: Document): void => {
 };
 
 /**
- * 検索結果ページのスタイル適用
+ * 指定ラベルに続く event-meta-content を取得する
+ */
+const findMetaContents = (doc: Document, label: string): HTMLElement[] => {
+  const labels = doc.querySelectorAll<HTMLElement>(".event-meta-label");
+  return Array.from(labels)
+    .filter((el) => el.textContent?.trim() === label)
+    .map((el) => el.nextElementSibling)
+    .filter(
+      (el): el is HTMLElement => el?.matches(".event-meta-content") ?? false,
+    );
+};
+
+/**
+ * 検索結果ページの審級関係欄の各列に背景色を適用する
  */
 export const applySearchResultPageStyles = (doc: Document): void => {
-  Array.from(doc.getElementsByTagName("td")).forEach((elem) => {
-    elem.style.height = "1.5em";
-    if (elem.classList.contains("ListLow3")) {
-      elem.style.background = "gold";
+  for (const content of findMetaContents(doc, "書誌情報")) {
+    for (const cell of content.querySelectorAll<HTMLElement>(`.ColDate`)) {
+      cell.style.background = "gold";
     }
-    Array.from(elem.children).forEach((child) => {
-      if (child.tagName === "FONT") {
-        child.setAttribute("size", "");
-      }
-      elem.style.fontSize = "14px";
-    });
-  });
+  }
+  for (const content of findMetaContents(doc, "審級関係")) {
+    for (const cell of content.querySelectorAll<HTMLElement>(`.ColJikenNo`)) {
+      cell.style.background = "salmon";
+    }
+  }
 };
 
 /**
