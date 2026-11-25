@@ -80,7 +80,6 @@ const setupHotkeys = (): void => {
     }
 
     bodyDocument.onkeyup = async (keyEvent) => {
-      console.log({ key: keyEvent.key }, { code: keyEvent.code });
       const pressed = buildKeyString(keyEvent);
       const isInputableElem = isEventOnInputableElem(keyEvent);
 

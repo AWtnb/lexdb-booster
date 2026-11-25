@@ -11,7 +11,6 @@ import {
 import { openResultEntries, openTopResult } from "./result-page";
 import {
   clearAllInputBox,
-  cycleFreeWord,
   focusFreeWord,
   pasteAndSearch,
   pasteCaseNumber,
@@ -105,16 +104,10 @@ export const ACTION_REGISTRY: Record<ActionId, ActionEntry> = {
     },
   },
   focusFreeWord: {
-    label: "フリーワード欄（末尾）にフォーカス",
+    label: "フリーワード欄にフォーカス",
     scope: "search",
     needsClipboard: false,
     run: (ctx) => focusFreeWord(ctx),
-  },
-  cycleFreeWord: {
-    label: "ANDフリーワード欄にフォーカス",
-    scope: "search",
-    needsClipboard: false,
-    run: (ctx) => cycleFreeWord(ctx),
   },
   pasteAndSearch: {
     label: "判例文字列を貼り付けて検索",

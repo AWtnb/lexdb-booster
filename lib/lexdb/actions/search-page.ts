@@ -150,58 +150,18 @@ export const pasteDate: HotkeyActionWithClipboardText = (
   return fillDateFields(bodyDocument, cb) !== null;
 };
 
-const FREEWORD_IDS = [
-  "InputFreeKeyword_Control_KEYWORD00",
-  "InputFreeKeyword_Control_KEYWORD05",
-  "InputFreeKeyword_Control_KEYWORD10",
-  "InputFreeKeyword_Control_KEYWORD15",
-  "InputFreeKeyword_Control_KEYWORD20",
-];
+const FREEWORD_ID = "KeywordText";
 
 /**
  * フリーワードの最後の入力済み欄にフォーカスする
  */
 export const focusFreeWord: HotkeyAction = ({ bodyDocument }): boolean => {
-  const filledInputIds = FREEWORD_IDS.filter((id) => {
-    const elem = bodyDocument.getElementById(id) as HTMLInputElement;
-    return elem.value !== "";
-  });
-
-  const target = filledInputIds.pop() ?? FREEWORD_IDS[0]!;
-  (bodyDocument.getElementById(target) as HTMLInputElement).select();
-  return true;
-};
-
-/**
- * フリーワードのAND欄へのフォーカスをサイクルする
- */
-export const cycleFreeWord: HotkeyAction = ({ bodyDocument }): boolean => {
-  const activeElem = bodyDocument.activeElement;
-  if (!activeElem) return false;
-
-  const idx = FREEWORD_IDS.indexOf(activeElem.id);
-  if (0 <= idx) {
-    const nextIdx = (idx + 1) % FREEWORD_IDS.length;
-    bodyDocument.getElementById(FREEWORD_IDS[nextIdx]!)?.focus();
+  const elem = bodyDocument.getElementById(FREEWORD_ID) as HTMLInputElement;
+  if (elem) {
+    elem.select();
     return true;
   }
-
-  const activeId = activeElem.id;
-  if (!activeId.startsWith("InputFreeKeyword_Control_KEYWORD")) {
-    bodyDocument.getElementById(FREEWORD_IDS[0]!)?.focus();
-    return true;
-  }
-
-  const current = parseInt(
-    activeId.replace("InputFreeKeyword_Control_KEYWORD", ""),
-  );
-
-  // 現在の行の先頭インデックス（KEYWORD00=0, KEYWORD05=1, ...）を求め、次へ進める
-  // 各行は5列区切りなので、Math.floorで所属行を特定
-  const rowIdx = Math.floor(current / 5);
-  const nextRowIdx = (rowIdx + 1) % FREEWORD_IDS.length;
-  bodyDocument.getElementById(FREEWORD_IDS[nextRowIdx]!)?.focus();
-  return true;
+  return false;
 };
 
 /**
@@ -243,13 +203,12 @@ const sliceFreewords = (words: string[]): string[] => {
  * フリーワード欄を埋める
  */
 const fillFreewords = (doc: Document, words: string[]): boolean => {
-  for (const [i, id] of FREEWORD_IDS.entries()) {
-    const elem = doc.getElementById(id) as HTMLInputElement;
-    elem.value = words[i] ?? "";
+  const elem = doc.getElementById(FREEWORD_ID) as HTMLInputElement;
+  if (elem) {
+    elem.value = words.join(" ");
+    return elem.value.trim() !== "";
   }
-  return FREEWORD_IDS.some(
-    (id) => (doc.getElementById(id) as HTMLInputElement).value !== "",
-  );
+  return false;
 };
 
 const setCourtCheckBox = (doc: Document, courtName: string) => {

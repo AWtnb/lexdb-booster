@@ -41,7 +41,6 @@ export type ActionId =
   | "pasteDate"
   | "pasteLexId"
   | "focusFreeWord"
-  | "cycleFreeWord"
   | "pasteAndSearch"
   | "copyCaseNumber"
   | "copyReference"
