@@ -7,6 +7,33 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 type Part = "major" | "minor" | "patch";
 
+/** 現在のブランチ名を取得する */
+const getCurrentBranch = (): string => {
+  return execSync("git rev-parse --abbrev-ref HEAD", {
+    encoding: "utf-8",
+  }).trim();
+};
+
+/** 未コミットの変更（未追跡ファイルを含む）があるか判定する */
+const hasUncommittedChanges = (): boolean => {
+  const result = execSync("git status --porcelain", { encoding: "utf-8" });
+  return 0 < result.trim().length;
+};
+
+/** main ブランチかつ作業ツリーがクリーンであることを検証する。満たさなければ終了する */
+const assertReleasable = (): void => {
+  const branch = getCurrentBranch();
+  if (branch !== "main") {
+    console.error(`must be on main branch (current: ${branch})`);
+    process.exit(1);
+  }
+
+  if (hasUncommittedChanges()) {
+    console.error("working tree has uncommitted changes");
+    process.exit(1);
+  }
+};
+
 /** 最新タグを取得する。なければ v0.0.0 を返す */
 const getLatestTag = (): string => {
   const result = execSync("git tag --sort=-v:refname", { encoding: "utf-8" });
@@ -42,7 +69,10 @@ const main = (): void => {
   const latest = getLatestTag();
   const newTag = bump(latest, part);
 
-  console.log(`${latest} → ${newTag}`);
+  console.log(`${latest} -> ${newTag}`);
+
+  // package.json を書き換える前に検証する
+  assertReleasable();
 
   updatePackageJson(newTag);
 
