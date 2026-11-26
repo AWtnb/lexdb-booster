@@ -103,8 +103,7 @@ const setupHotkeys = (): void => {
 
     if (isSearchResultPage(url)) {
       const anchors = getSyoshiAnchors(bodyDocument);
-      // 2つで1セット（書誌リンク + 何か）だが、大審院判例など全文ページがない場合は1件
-      if (anchors.length <= 2) {
+      if (anchors.length === 1) {
         openTopResult({
           url,
           keyEvent: null as unknown as KeyboardEvent,
