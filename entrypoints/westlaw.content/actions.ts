@@ -316,3 +316,25 @@ export const copyReference = (): boolean => {
   }
   return false;
 };
+
+declare global {
+  interface Window {
+    /** ページ側で定義されている「全文」タブへの切り替え関数 */
+    transitTabCaseFullText: () => void;
+    /** ページ側で定義されている「要旨」タブへの切り替え関数 */
+    transitTabCaseAbstract: () => void;
+  }
+}
+
+export {};
+
+export const gotoZenbun = (): boolean => {
+  const info = document.getElementById("related-info-case-full-text");
+  if (!info) return false;
+  if (info.style.display === "none") {
+    window.transitTabCaseFullText();
+  } else {
+    window.transitTabCaseAbstract();
+  }
+  return true;
+};

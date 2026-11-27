@@ -10,6 +10,7 @@ import {
   getDisplayedCaseNumber,
   getDisplayedWljpId,
   goSearchHome,
+  gotoZenbun,
   pasteAndSearch,
   pasteCaseNumber,
   pasteDateField,
@@ -88,6 +89,7 @@ const WESTLAW_DETAIL_KEY_BINDINGS: KeyBinding[] = [
     },
   },
   { key: "KeyQ", action: copyReference },
+  { key: "KeyZ", action: gotoZenbun },
 ];
 
 const styleUpDetailPage = () => {
@@ -120,6 +122,7 @@ export default defineContentScript({
     "https://go.westlawjapan.com/wljp/app/search*",
     "https://go.westlawjapan.com/wljp/app/welcome*",
   ],
+  world: "MAIN",
   main: () => {
     const url = document.location.href;
     if (url.includes("wljp/app/welcome")) {
